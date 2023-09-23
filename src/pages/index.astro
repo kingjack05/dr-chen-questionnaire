@@ -1,9 +1,8 @@
 ---
-import { Counter } from "../components/Counter/Counter.jsx"
+import {PatientPage} from "../components/PatientPage/PatientPage"
 import BasicLayout from "../global/layouts/BasicLayout.astro"
 ---
 
 <BasicLayout>
-	<h2 class="bg-yellow-500">Astro</h1>
-	<Counter client:load />
+	<PatientPage client:load />
 </BasicLayout>
