@@ -35,8 +35,13 @@ module.exports = {
                 },
             },
             fontFamily: {
-                IBMPlexSans: ["IBM Plex Sans", 'Arial', 'Helvetica', 'sans-serif'],
-            }
+                IBMPlexSans: [
+                    "IBM Plex Sans",
+                    "Arial",
+                    "Helvetica",
+                    "sans-serif",
+                ],
+            },
         },
     },
     plugins: [
@@ -55,6 +60,16 @@ module.exports = {
                     color: "white",
                     border: "0",
                     padding: ".5rem 1rem",
+                },
+                ".input": {
+                    borderBottom: "1px solid #c6c6c6",
+                    "&:focus": {
+                        borderColor: "#393939",
+                        outlineWidth: "0",
+                    },
+                    "&:disabled": {
+                        borderColor: "transparent",
+                    },
                 },
             })
         },
