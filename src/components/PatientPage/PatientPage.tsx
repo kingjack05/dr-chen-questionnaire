@@ -1,12 +1,13 @@
 import { useStore } from "@nanostores/react"
-import { $currentPatientID } from "./store"
+import { $currentPatientData, $currentPatientID } from "./store"
 import { useState } from "react"
 import { Popover } from "@headlessui/react"
 import { useForm } from "react-hook-form"
-import type { SubmitHandler } from "react-hook-form"
+import { PatientBasicInfoForm } from "../forms/PatientBasicInfoForm"
 
 export const PatientPage = () => {
     const currentPatientID = useStore($currentPatientID)
+    const currentPatientData = useStore($currentPatientData)
     const [basicInfoFormDisabled, setBasicInfoFormDisabled] = useState(true)
     return (
         <>
@@ -31,7 +32,13 @@ export const PatientPage = () => {
                         </svg>
                     </div>
                     <div className="mt-2">
-                        <BasicInfoForm disabled={basicInfoFormDisabled} />
+                        <PatientBasicInfoForm
+                            disabled={basicInfoFormDisabled}
+                            defaultValues={{
+                                ...currentPatientData,
+                                id: currentPatientID,
+                            }}
+                        />
                     </div>
                     <div className="mt-6 flex">
                         <h6>其他資料</h6>
@@ -42,6 +49,11 @@ export const PatientPage = () => {
                         >
                             <path d="M2 26h28v2H2zM25.4 9c.8-.8.8-2 0-2.8l-3.6-3.6c-.8-.8-2-.8-2.8 0l-15 15V24h6.4l15-15zm-5-5L24 7.6l-3 3L17.4 7l3-3zM6 22v-3.6l10-10 3.6 3.6-10 10H6z" />
                         </svg>
+                    </div>
+                    <div>
+                        <a href="/dataStudio" className="btn" target="_blank">
+                            詳細資料
+                        </a>
                     </div>
                 </div>
                 <div className="w-1/3">
@@ -233,92 +245,6 @@ const UploadPicPopover = () => {
                     )
                 }}
             </Popover>
-        </>
-    )
-}
-
-type BasicInfoInputs = {
-    gender: "male" | "female"
-    name: string
-    id: number
-    mainDiagnosis: string
-}
-
-const BasicInfoForm = ({ disabled = true }) => {
-    const {
-        register,
-        handleSubmit,
-        watch,
-        formState: { errors },
-    } = useForm<BasicInfoInputs>({
-        defaultValues: {
-            gender: "male",
-            name: "郭克嚴",
-            id: 10836635,
-            mainDiagnosis: "Raynaud's Phenomenon",
-        },
-    })
-
-    return (
-        <>
-            <form>
-                <fieldset disabled={disabled}>
-                    <div className="flex">
-                        性別:
-                        <label className="ml-6">
-                            <input
-                                {...register("gender")}
-                                className="peer hidden"
-                                type="radio"
-                                value="male"
-                            />
-                            <svg
-                                className="mt-[1.5px] h-5 w-5 fill-current text-gray-300 peer-checked:text-gray-800"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 32 32"
-                            >
-                                <path d="M18 4v2h6.586l-7.688 7.689a8.028 8.028 0 1 0 1.414 1.414L26 7.414V14h2V4Zm-6 22a6 6 0 1 1 6-6 6.007 6.007 0 0 1-6 6Z" />
-                            </svg>
-                        </label>
-                        <div className="text-gray-300">/</div>
-                        <label>
-                            <input
-                                {...register("gender")}
-                                className="peer hidden"
-                                type="radio"
-                                value="female"
-                            />
-                            <svg
-                                className="mt-0.5 h-5 w-5 fill-current text-gray-300 peer-checked:text-gray-800"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 32 32"
-                            >
-                                <path d="M17 19.93a8 8 0 1 0-2 0V22h-5v2h5v4h2v-4h5v-2h-5ZM10 12a6 6 0 1 1 6 6 6.007 6.007 0 0 1-6-6Z" />
-                            </svg>
-                        </label>
-                    </div>
-                    <label className="block">
-                        姓名:
-                        <input {...register("name")} className="input ml-6" />
-                    </label>
-                    <label className="block">
-                        病歷號:
-                        <input {...register("id")} className="input ml-2" />
-                    </label>
-                    <label className="block">
-                        主診斷:
-                        <input
-                            {...register("mainDiagnosis")}
-                            className="input ml-2"
-                            list="diagnoses"
-                        />
-                        <datalist id="diagnoses">
-                            <option value="Raynaud's Phenomenon" />
-                            <option value="AIN Compression" />
-                        </datalist>
-                    </label>
-                </fieldset>
-            </form>
         </>
     )
 }
