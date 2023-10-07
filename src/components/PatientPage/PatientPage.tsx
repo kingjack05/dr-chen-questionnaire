@@ -1,21 +1,23 @@
 import { useStore } from "@nanostores/react"
-import { $currentPatientData, $currentPatientID } from "./store"
+import { $getPatientData, $patientIDAndNames } from "./store"
 import { useState } from "react"
-import { Popover } from "@headlessui/react"
+import { Combobox, Popover } from "@headlessui/react"
 import { useForm } from "react-hook-form"
 import { PatientBasicInfoForm } from "../forms/PatientBasicInfoForm"
 
 export const PatientPage = () => {
-    const currentPatientID = useStore($currentPatientID)
-    const currentPatientData = useStore($currentPatientData)
+    const queryParameters = new URLSearchParams(window.location.search)
+    const patientID = queryParameters.get("id") ?? "10836635"
+    const patientData = $getPatientData(patientID)
+
     const [basicInfoFormDisabled, setBasicInfoFormDisabled] = useState(true)
     return (
         <>
             <div className="mx-auto my-4 max-w-xs">
                 <SearchBar />
             </div>
-            <div className="container mx-auto flex">
-                <div className="w-1/3">
+            <div className="container mx-auto flex flex-col sm:flex-row">
+                <div className=" p-4 sm:w-1/3">
                     <div className="flex">
                         <h6>基本資料</h6>
                         <svg
@@ -35,13 +37,13 @@ export const PatientPage = () => {
                         <PatientBasicInfoForm
                             disabled={basicInfoFormDisabled}
                             defaultValues={{
-                                ...currentPatientData,
-                                id: currentPatientID,
+                                ...patientData,
+                                id: patientID,
                             }}
                         />
                     </div>
                     <div className="mt-6 flex">
-                        <h6>其他資料</h6>
+                        <h6 className="mb-2">其他資料</h6>
                         <svg
                             className="ml-2 mt-1 h-5 w-5 cursor-pointer fill-current text-gray-300 hover:text-gray-800"
                             xmlns="http://www.w3.org/2000/svg"
@@ -51,12 +53,16 @@ export const PatientPage = () => {
                         </svg>
                     </div>
                     <div>
-                        <a href="/dataStudio" className="btn" target="_blank">
-                            詳細資料
+                        <a
+                            href={`/dataStudio?table=${patientData.mainDiagnosis}&id=${patientID}`}
+                            className="btn"
+                            target="_blank"
+                        >
+                            前往表格
                         </a>
                     </div>
                 </div>
-                <div className="w-1/3">
+                <div className=" p-4 sm:w-1/3">
                     <div className="relative flex">
                         <h6>照片</h6>
                         <UploadPicPopover />
@@ -78,7 +84,7 @@ export const PatientPage = () => {
                         />
                     </div>
                 </div>
-                <div className="w-1/3">
+                <div className=" p-4 sm:w-1/3">
                     <div className="flex">
                         <h6 className="flex-grow">問卷資料</h6>
                         <QuestionnaireSettingPopover />
@@ -142,21 +148,61 @@ export const PatientPage = () => {
 }
 
 const SearchBar = () => {
+    const patientIDAndNames = useStore($patientIDAndNames)
+    const [query, setQuery] = useState("")
+
+    const filteredPateints = query
+        ? patientIDAndNames.filter((patient) => {
+              return patient.id.includes(query)
+          })
+        : []
+
     return (
         <>
             <div className="relative">
-                <input
-                    type="text"
-                    className="peer mb-2 mr-3 mt-2 w-full border-b border-gray-300 bg-transparent px-8 py-1 leading-tight text-gray-700 focus:border-gray-500 focus:outline-none"
-                    placeholder="輸入病歷號"
-                />
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="absolute left-0 top-2 h-6 w-6 fill-current text-gray-300 peer-focus:text-gray-500"
-                    viewBox="0 0 32 32"
+                <Combobox
+                    onChange={(value) => {
+                        window.open(`?id=${value}`)
+                    }}
                 >
-                    <path d="m29 27.586-7.552-7.552a11.018 11.018 0 1 0-1.414 1.414L27.586 29ZM4 13a9 9 0 1 1 9 9 9.01 9.01 0 0 1-9-9Z" />
-                </svg>
+                    <div className="relative">
+                        <Combobox.Input
+                            onChange={(e) => setQuery(e.target.value)}
+                            className="peer mb-2 mr-3 mt-2 w-full border-b border-gray-300 bg-transparent px-8 py-1 leading-tight text-gray-700 focus:border-gray-500 focus:outline-none"
+                            placeholder="輸入病歷號"
+                        />
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="absolute left-0 top-2 h-6 w-6 fill-current text-gray-300 peer-focus:text-gray-500"
+                            viewBox="0 0 32 32"
+                        >
+                            <path d="m29 27.586-7.552-7.552a11.018 11.018 0 1 0-1.414 1.414L27.586 29ZM4 13a9 9 0 1 1 9 9 9.01 9.01 0 0 1-9-9Z" />
+                        </svg>
+                    </div>
+                    <Combobox.Options className="absolute w-full bg-gray-100">
+                        {filteredPateints.map((patient) => (
+                            <Combobox.Option
+                                key={patient.id}
+                                value={patient.id}
+                            >
+                                {({ active }) => (
+                                    <div
+                                        className={`flex w-full p-1 ${
+                                            active
+                                                ? "bg-teal-600 text-white"
+                                                : ""
+                                        }`}
+                                    >
+                                        <div className="flex-1">
+                                            {patient.id}
+                                        </div>
+                                        <div>{patient.name}</div>
+                                    </div>
+                                )}
+                            </Combobox.Option>
+                        ))}
+                    </Combobox.Options>
+                </Combobox>
             </div>
         </>
     )

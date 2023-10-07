@@ -1,7 +1,5 @@
 import { action, atom, computed, map } from "nanostores"
 
-export const $currentPatientID = atom("10836635")
-
 type PatientData = {
     mainDiagnosis: string
     gender: "male" | "female"
@@ -77,13 +75,17 @@ export const $addPatient = action($patientDB, "addPatient", (store, data) => {
     store.setKey(id, rest)
 })
 
-export const $currentPatientData = computed($currentPatientID, (id) => {
-    const db = $patientDB.get()
-    return db[id]
-})
+export const $getPatientData = action(
+    $patientDB,
+    "getPatientData",
+    (store, id) => {
+        const db = store.get()
+        return db[id]
+    },
+)
 
-export const $patientIDs = computed($patientDB, (db) => {
-    return Object.keys(db)
+export const $patientIDAndNames = computed($patientDB, (db) => {
+    return Object.entries(db).map(([id, data]) => ({ id, name: data.name }))
 })
 
 export const $raynaudPatients = computed($patientDB, (db) => {

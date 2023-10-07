@@ -3,34 +3,17 @@ import { AgGridReact } from "ag-grid-react"
 import "ag-grid-community/styles/ag-grid.css"
 import "ag-grid-community/styles/ag-theme-alpine.css"
 import "ag-grid-enterprise"
-import { useMemo, useState } from "react"
-import { useStore } from "@nanostores/react"
-import { $currentTableColumnDefs, $currentTableRowID } from "./store"
-import { $raynaudPatients } from "../PatientPage/store"
+import { useMemo } from "react"
+import { $AINPatients, $raynaudPatients } from "../PatientPage/store"
 import { StatisticalAnalysisPanel } from "./custom tool panels/StatisticalAnalysisPanel"
 import { ActionPanel } from "./custom tool panels/ActionPanel"
 
 export const DataStudioPage = () => {
-    const rowData = Object.entries(useStore($raynaudPatients))
-        .map(([id, patientData]) => {
-            return patientData.otherInfo.operations.map((item) => {
-                const date = item.date
-                return item.followUp.map((i) => {
-                    const yearsAfterOP = i.yearsAfterOP
-                    const digitalSkinTemp = i.digitalSkinTemp
-                    return {
-                        id,
-                        date,
-                        yearsAfterOP,
-                        digitalSkinTemp,
-                        ...patientData.otherInfo,
-                        ...patientData,
-                    }
-                })
-            })
-        })
-        .flat(Infinity)
-    const currentTableColumnDefs = useStore($currentTableColumnDefs)
+    const queryParameters = new URLSearchParams(window.location.search)
+    const table = queryParameters.get("table") ?? "Raynaud's Phenomenon"
+    const patientID = queryParameters.get("id") ?? "10836635"
+    const { rowData, columnDefs, rowIDGetter } = tableConfigsFactory(table)
+
     const defaultColDef = useMemo(
         () => ({
             editable: true,
@@ -41,7 +24,6 @@ export const DataStudioPage = () => {
         }),
         [],
     )
-    const getRowId = useStore($currentTableRowID)
 
     return (
         <div
@@ -49,11 +31,11 @@ export const DataStudioPage = () => {
             style={{ height: "100vh", width: "100vw" }}
         >
             <AgGridReact
-                columnDefs={currentTableColumnDefs}
+                columnDefs={columnDefs}
                 rowData={rowData}
                 defaultColDef={defaultColDef}
                 rowSelection={"single"}
-                getRowId={getRowId}
+                getRowId={rowIDGetter}
                 sideBar={{
                     toolPanels: [
                         {
@@ -82,4 +64,145 @@ export const DataStudioPage = () => {
             ></AgGridReact>
         </div>
     )
+}
+
+/**
+ * @param {string} table - Name of the table
+ * @returns {{rowData, columnDefs, rowIDGetter}}
+ */
+const tableConfigsFactory = (table) => {
+    if (table === "Raynaud's Phenomenon") {
+        const raynaudPatients = $raynaudPatients.get()
+        const rowData = Object.entries(raynaudPatients)
+            .map(([id, patientData]) => {
+                return patientData.otherInfo.operations.map((item) => {
+                    const date = item.date
+                    return item.followUp.map((i) => {
+                        const yearsAfterOP = i.yearsAfterOP
+                        const digitalSkinTemp = i.digitalSkinTemp
+                        return {
+                            id,
+                            date,
+                            yearsAfterOP,
+                            digitalSkinTemp,
+                            ...patientData.otherInfo,
+                            ...patientData,
+                        }
+                    })
+                })
+            })
+            .flat(Infinity)
+        const columnDefs = [
+            {
+                headerName: "基本資料",
+                children: [
+                    { field: "id" },
+                    { field: "name", columnGroupShow: "open" },
+                    { field: "gender", columnGroupShow: "open" },
+                    { field: "birthday", columnGroupShow: "open" },
+                ],
+            },
+            {
+                headerName: "疾病資料",
+                children: [
+                    { field: "患側" },
+                    {
+                        headerName: "風險因子",
+                        children: [
+                            { field: "抽菸" },
+                            { field: "自體免疫疾病" },
+                            { field: "心理疾病" },
+                        ],
+                        columnGroupShow: "open",
+                    },
+                ],
+            },
+            {
+                headerName: "手術資料",
+                children: [{ field: "date", headerName: "時間" }],
+            },
+            {
+                headerName: "追蹤資料",
+                children: [
+                    { field: "yearsAfterOP" },
+                    { field: "digitalSkinTemp" },
+                    {
+                        headerName: "問卷資料",
+                        children: [
+                            {
+                                headerName: "Michigan",
+                                children: [
+                                    {
+                                        field: "overallHandFunctionRight",
+                                    },
+                                    {
+                                        field: "overallHandFunctionLeft",
+                                    },
+                                    {
+                                        field: "ADLRHOnehanded",
+                                    },
+                                    {
+                                        field: "ADLRHOverall",
+                                    },
+                                    {
+                                        field: "ADLLHOnehanded",
+                                    },
+                                    {
+                                        field: "ADLLHOverall",
+                                    },
+                                    {
+                                        field: "ADLTwohanded",
+                                    },
+                                    {
+                                        field: "work",
+                                    },
+                                    {
+                                        field: "pain",
+                                    },
+                                    {
+                                        field: "aestheticsRight",
+                                    },
+                                    {
+                                        field: "aestheticsLeft",
+                                    },
+                                    {
+                                        field: "satisfactionRight",
+                                    },
+                                    {
+                                        field: "satisfactionLeft",
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            },
+        ]
+        const rowIDGetter = (params) => {
+            return `${params.data.id}${params.data.date}${params.data.yearsAfterOP}`
+        }
+        return { rowData, columnDefs, rowIDGetter }
+    }
+
+    if (table === "AIN Compression") {
+        const AINPatients = $AINPatients.get()
+        const rowData = Object.entries(AINPatients).map(([id, patientData]) => {
+            return { id, ...patientData }
+        })
+        const columnDefs = [
+            {
+                headerName: "基本資料",
+                children: [
+                    { field: "id" },
+                    { field: "name", columnGroupShow: "open" },
+                    { field: "gender", columnGroupShow: "open" },
+                    { field: "birthday", columnGroupShow: "open" },
+                ],
+            },
+        ]
+        const rowIDGetter = (params) => {
+            return `${params.data.id}`
+        }
+        return { rowData, columnDefs, rowIDGetter }
+    }
 }
