@@ -1,1 +1,11 @@
-{}
+{
+    "sqltools.useNodeRuntime": true,
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "testDB",
+            "database": "${workspaceFolder:dr-chen-questionnaire}/testDB.sqlite3"
+        }
+    ]
+}

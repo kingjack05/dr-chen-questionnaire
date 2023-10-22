@@ -1,35 +1,45 @@
 {
-  "name": "astro-react-template",
-  "type": "module",
-  "version": "0.0.1",
-  "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
-  },
-  "dependencies": {
-    "@astrojs/react": "^3.0.1",
-    "@astrojs/tailwind": "^5.0.0",
-    "@headlessui/react": "^1.7.17",
-    "@nanostores/query": "^0.2.4",
-    "@nanostores/react": "^0.7.1",
-    "@types/react": "^18.0.21",
-    "@types/react-dom": "^18.0.6",
-    "ag-grid-community": "^30.1.0",
-    "ag-grid-enterprise": "^30.1.0",
-    "ag-grid-react": "^30.1.0",
-    "astro": "^3.0.10",
-    "clsx": "^2.0.0",
-    "nanostores": "^0.9.3",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0",
-    "react-hook-form": "^7.46.2",
-    "tailwindcss": "^3.0.24"
-  },
-  "devDependencies": {
-    "prettier": "^3.0.3",
-    "prettier-plugin-tailwindcss": "^0.5.4"
-  }
+    "name": "astro-react-template",
+    "type": "module",
+    "version": "0.0.1",
+    "scripts": {
+        "dev": "astro dev",
+        "start": "astro dev",
+        "build": "astro build",
+        "preview": "astro preview",
+        "astro": "astro",
+        "migrate": "drizzle-kit generate:pg"
+    },
+    "dependencies": {
+        "@astrojs/react": "^3.0.1",
+        "@astrojs/tailwind": "^5.0.0",
+        "@astrojs/vercel": "^5.0.2",
+        "@headlessui/react": "^1.7.17",
+        "@nanostores/query": "^0.2.4",
+        "@nanostores/react": "^0.7.1",
+        "@trpc/client": "^10.41.0",
+        "@trpc/server": "^10.41.0",
+        "@types/node": "^20.8.7",
+        "@types/react": "^18.0.21",
+        "@types/react-dom": "^18.0.6",
+        "ag-grid-community": "^30.1.0",
+        "ag-grid-enterprise": "^30.1.0",
+        "ag-grid-react": "^30.1.0",
+        "astro": "^3.3.2",
+        "clsx": "^2.0.0",
+        "drizzle-orm": "^0.28.6",
+        "drizzle-zod": "^0.5.1",
+        "nanostores": "^0.9.3",
+        "postgres": "^3.4.0",
+        "react": "^18.0.0",
+        "react-dom": "^18.0.0",
+        "react-hook-form": "^7.46.2",
+        "tailwindcss": "^3.0.24",
+        "zod": "^3.22.4"
+    },
+    "devDependencies": {
+        "drizzle-kit": "^0.19.13",
+        "prettier": "^3.0.3",
+        "prettier-plugin-tailwindcss": "^0.5.4"
+    }
 }
