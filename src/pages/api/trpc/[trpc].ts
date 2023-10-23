@@ -1,14 +1,21 @@
+import { fetchRequestHandler } from "@trpc/server/adapters/fetch"
 import type { APIRoute } from "astro"
-import { db } from "../../../server/db"
+import { appRouter } from "../../../server/routerIndex"
 
 export const prerender = false
 
-export const ALL: APIRoute = async ({ params, request }) => {
-    const patients = await db.query.patient.findMany()
-    return new Response(
-        JSON.stringify({
-            message: `This was a GET at ${params.trpc}`,
-            patients: JSON.stringify(patients),
-        }),
-    )
+export const ALL: APIRoute = ({ request }) => {
+    return fetchRequestHandler({
+        endpoint: "/api/trpc",
+        req: request,
+        router: appRouter,
+        createContext: ({ req, resHeaders }) => {
+            return { req, resHeaders }
+        },
+        onError({ error }) {
+            if (import.meta.env.DEV && error.code === "INTERNAL_SERVER_ERROR") {
+                throw error
+            }
+        },
+    })
 }
