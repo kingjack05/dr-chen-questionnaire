@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "pg",
-  "id": "e7874d37-1de3-47e5-adb1-dd299c36ba0c",
+  "id": "ff8bdc35-8ac2-44c0-bb99-f34734e25b25",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "michiganHandOutcome": {
@@ -47,11 +47,17 @@
         "id": {
           "name": "id",
           "type": "integer",
-          "primaryKey": false,
-          "notNull": false
+          "primaryKey": true,
+          "notNull": true
         },
         "name": {
           "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "gender": {
+          "name": "gender",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -64,29 +70,42 @@
         },
         "diagnoses": {
           "name": "diagnoses",
-          "type": "json",
+          "type": "text[]",
           "primaryKey": false,
           "notNull": false
         },
         "followingQuestionnaires": {
           "name": "followingQuestionnaires",
-          "type": "json",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lastEdited": {
+          "name": "lastEdited",
+          "type": "timestamp",
           "primaryKey": false,
           "notNull": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "nameIdx": {
+          "name": "nameIdx",
+          "columns": [
+            "name"
+          ],
+          "isUnique": false
+        },
+        "lastEditedIdx": {
+          "name": "lastEditedIdx",
+          "columns": [
+            "lastEdited"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "patient_id_unique": {
-          "name": "patient_id_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "id"
-          ]
-        }
-      }
+      "uniqueConstraints": {}
     }
   },
   "enums": {},

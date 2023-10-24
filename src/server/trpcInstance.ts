@@ -43,9 +43,12 @@ type Context = inferAsyncReturnType<typeof createContext>
  * errors on the backend.
  */
 import { initTRPC } from "@trpc/server"
+import superjson from "superjson"
 import { z, ZodError } from "zod"
 
 export const t = initTRPC.context<Context>().create({
+    // transformer needed to use date objects https://trpc.io/docs/server/data-transformers
+    transformer: superjson,
     errorFormatter({ shape, error }) {
         return {
             ...shape,

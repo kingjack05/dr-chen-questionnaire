@@ -1,16 +1,30 @@
 import { useStore } from "@nanostores/react"
-import { $getPatientData, $patientIDAndNames } from "./store"
+import { $patientIDAndNames } from "./store"
 import { useState } from "react"
-import { Combobox, Popover } from "@headlessui/react"
+import { Combobox, Popover, Dialog } from "@headlessui/react"
 import { useForm } from "react-hook-form"
 import { PatientBasicInfoForm } from "../forms/PatientBasicInfoForm"
+import { trpc } from "../trpc"
+import { QueryContextProvider } from "../Providers/QueryContext"
+import { AddPatientForm } from "../forms/AddPatientForm"
 
-export const PatientPage = () => {
+const PatientPageWithoutProvider = () => {
     const queryParameters = new URLSearchParams(window.location.search)
-    const patientID = queryParameters.get("id") ?? "10836635"
-    const patientData = $getPatientData(patientID)
+    const patientLastEdited = trpc.patient.patientLastEdited.useQuery()
+    const patientID =
+        queryParameters.get("id") ?? patientLastEdited.data?.id
+            ? String(patientLastEdited.data?.id)
+            : "10836635"
+    const patientData = trpc.patient.patientById.useQuery(
+        Number(patientID),
+    ).data
+    const editPatient = trpc.patient.editPatient.useMutation()
 
     const [basicInfoFormDisabled, setBasicInfoFormDisabled] = useState(true)
+
+    if (!patientData) {
+        return <>Loading...</>
+    }
     return (
         <>
             <div className="mx-auto my-4 max-w-xs">
@@ -19,47 +33,64 @@ export const PatientPage = () => {
             <div className="container mx-auto flex flex-col sm:flex-row">
                 <div className=" p-4 sm:w-1/3">
                     <div className="flex">
-                        <h6>基本資料</h6>
-                        <svg
-                            onClick={() => {
-                                setBasicInfoFormDisabled(!basicInfoFormDisabled)
-                            }}
-                            className={`${
-                                basicInfoFormDisabled ? "" : "text-gray-800"
-                            } ml-2 mt-1 h-5 w-5 cursor-pointer fill-current text-gray-300 hover:text-gray-800`}
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 32 32"
-                        >
-                            <path d="M2 26h28v2H2zM25.4 9c.8-.8.8-2 0-2.8l-3.6-3.6c-.8-.8-2-.8-2.8 0l-15 15V24h6.4l15-15zm-5-5L24 7.6l-3 3L17.4 7l3-3zM6 22v-3.6l10-10 3.6 3.6-10 10H6z" />
-                        </svg>
+                        <div className="flex flex-grow">
+                            <h6>基本資料</h6>
+                            <svg
+                                onClick={() => {
+                                    setBasicInfoFormDisabled(
+                                        !basicInfoFormDisabled,
+                                    )
+                                }}
+                                className={`${
+                                    basicInfoFormDisabled ? "" : "text-gray-800"
+                                } ml-2 mt-1 h-5 w-5 cursor-pointer fill-current text-gray-300 hover:text-gray-800`}
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 32 32"
+                            >
+                                <path d="M2 26h28v2H2zM25.4 9c.8-.8.8-2 0-2.8l-3.6-3.6c-.8-.8-2-.8-2.8 0l-15 15V24h6.4l15-15zm-5-5L24 7.6l-3 3L17.4 7l3-3zM6 22v-3.6l10-10 3.6 3.6-10 10H6z" />
+                            </svg>
+                        </div>
+                        <AddPatientModal />
                     </div>
                     <div className="mt-2">
                         <PatientBasicInfoForm
                             disabled={basicInfoFormDisabled}
+                            onSubmit={(v) => {
+                                editPatient.mutate(v)
+                            }}
                             defaultValues={{
                                 ...patientData,
-                                id: patientID,
+                                lastEdited: patientData.lastEdited
+                                    ? new Date(patientData.lastEdited)
+                                    : new Date(),
                             }}
                         />
                     </div>
-                    <div className="mt-6 flex">
-                        <h6 className="mb-2">其他資料</h6>
-                        <svg
-                            className="ml-2 mt-1 h-5 w-5 cursor-pointer fill-current text-gray-300 hover:text-gray-800"
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 32 32"
-                        >
-                            <path d="M2 26h28v2H2zM25.4 9c.8-.8.8-2 0-2.8l-3.6-3.6c-.8-.8-2-.8-2.8 0l-15 15V24h6.4l15-15zm-5-5L24 7.6l-3 3L17.4 7l3-3zM6 22v-3.6l10-10 3.6 3.6-10 10H6z" />
-                        </svg>
-                    </div>
-                    <div>
-                        <a
-                            href={`/dataStudio?table=${patientData.mainDiagnosis}&id=${patientID}`}
-                            className="btn"
-                            target="_blank"
-                        >
-                            前往表格
-                        </a>
+                    <div className=" hidden sm:block">
+                        <div className="mt-6 flex">
+                            <h6 className="mb-2">其他資料</h6>
+                            <svg
+                                className="ml-2 mt-1 h-5 w-5 cursor-pointer fill-current text-gray-300 hover:text-gray-800"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 32 32"
+                            >
+                                <path d="M2 26h28v2H2zM25.4 9c.8-.8.8-2 0-2.8l-3.6-3.6c-.8-.8-2-.8-2.8 0l-15 15V24h6.4l15-15zm-5-5L24 7.6l-3 3L17.4 7l3-3zM6 22v-3.6l10-10 3.6 3.6-10 10H6z" />
+                            </svg>
+                        </div>
+                        {patientData.diagnoses &&
+                            patientData.diagnoses.map((diagnosis) => {
+                                return (
+                                    <div>
+                                        <a
+                                            href={`/dataStudio?table=${diagnosis}&id=${patientID}`}
+                                            className="btn"
+                                            target="_blank"
+                                        >
+                                            前往{diagnosis}表格
+                                        </a>
+                                    </div>
+                                )
+                            })}
                     </div>
                 </div>
                 <div className=" p-4 sm:w-1/3">
@@ -144,6 +175,14 @@ export const PatientPage = () => {
                 </div>
             </div>
         </>
+    )
+}
+
+export const PatientPage = () => {
+    return (
+        <QueryContextProvider>
+            <PatientPageWithoutProvider />
+        </QueryContextProvider>
     )
 }
 
@@ -415,6 +454,50 @@ const QuestionnaireSettingPopover = () => {
                     )
                 }}
             </Popover>
+        </>
+    )
+}
+
+const AddPatientModal = () => {
+    let [isOpen, setIsOpen] = useState(false)
+    const addPatient = trpc.patient.addPatient.useMutation()
+
+    return (
+        <>
+            <button
+                className="text-gray-300 hover:text-gray-800"
+                onClick={() => {
+                    setIsOpen(true)
+                }}
+            >
+                + 新建檔案
+            </button>
+            <Dialog
+                className=" relative"
+                open={isOpen}
+                onClose={() => setIsOpen(false)}
+            >
+                {({ open }) => {
+                    return (
+                        <>
+                            <div
+                                className="fixed inset-0 bg-black/30"
+                                aria-hidden="true"
+                            />
+                            <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
+                                <Dialog.Panel className="mx-auto max-w-sm rounded bg-white py-4 pl-4 pr-8">
+                                    <AddPatientForm
+                                        onSubmit={(v) => {
+                                            console.log(v)
+                                            addPatient.mutate(v)
+                                        }}
+                                    />
+                                </Dialog.Panel>
+                            </div>
+                        </>
+                    )
+                }}
+            </Dialog>
         </>
     )
 }

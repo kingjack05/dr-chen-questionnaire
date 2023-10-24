@@ -3,31 +3,32 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import toast, { Toaster } from "react-hot-toast"
 
-import { insertPatientSchema } from "../../server/patients/schema"
+import {
+    diagnosisEnum,
+    questionnaireEnum,
+    insertPatientSchema,
+} from "../../server/patients/schema"
 
 type TForm = z.infer<typeof insertPatientSchema>
 
 type PropTypes = {
-    disabled: boolean
     onSubmit: SubmitHandler<TForm>
-    defaultValues: TForm
 }
 
-export const PatientBasicInfoForm = ({
-    disabled = false,
-    onSubmit,
-    defaultValues,
-}: PropTypes) => {
+export const AddPatientForm = ({ onSubmit }: PropTypes) => {
     const {
         register,
         handleSubmit,
         watch,
         formState: { errors },
     } = useForm<TForm>({
-        defaultValues,
         // zodResolver zod version issues: https://github.com/colinhacks/zod/issues/2663, https://github.com/orgs/react-hook-form/discussions/10861
         // @ts-ignore can't figure it out so just ignoring it for now https://github.com/react-hook-form/resolvers/issues/451
         resolver: zodResolver(insertPatientSchema),
+        defaultValues: {
+            diagnoses: [],
+            followingQuestionnaires: [],
+        },
     })
 
     return (
@@ -37,18 +38,18 @@ export const PatientBasicInfoForm = ({
                     (data) => {
                         try {
                             onSubmit(data)
-                            toast.success("編輯成功")
+                            toast.success("建檔成功")
                         } catch (error) {
-                            toast.error("編輯失敗")
+                            toast.error("建檔失敗")
                         }
                     },
-                    (e) => {
-                        console.log(e)
-                        toast.error("編輯失敗")
+                    (error) => {
+                        console.log(error)
+                        toast.error("建檔失敗")
                     },
                 )}
             >
-                <fieldset disabled={disabled}>
+                <fieldset>
                     <div className="flex">
                         性別:
                         <label className="ml-6">
@@ -87,61 +88,60 @@ export const PatientBasicInfoForm = ({
                         姓名:
                         <input
                             {...register("name")}
-                            className="input ml-6 bg-white"
+                            className="input mb-2 block bg-transparent"
                         />
                     </label>
                     <label className="block">
                         病歷號:
                         <input
-                            {...register("id")}
-                            className="input ml-2 bg-white"
+                            type="number"
+                            {...register("id", {
+                                valueAsNumber: true,
+                            })}
+                            className="input mb-2 block bg-transparent"
+                        />
+                    </label>
+                    <label className="block">
+                        生日:
+                        <input
+                            type="date"
+                            {...register("birthday")}
+                            className="ml-4"
                         />
                     </label>
                     <div>
                         主診斷:
-                        {disabled ? (
-                            <div className="ml-2 inline-block">
-                                {defaultValues.diagnoses?.join(", ")}
-                            </div>
-                        ) : (
-                            <>
-                                <label className="block">
-                                    <input
-                                        type="checkbox"
-                                        value="Raynaud"
-                                        {...register("diagnoses")}
-                                        className=" mr-1"
-                                    />
-                                    Raynaud
-                                </label>
-                                <label className="block">
-                                    <input
-                                        type="checkbox"
-                                        value="RA"
-                                        {...register("diagnoses")}
-                                        className=" mr-1"
-                                    />
-                                    RA
-                                </label>
-                                <label className="block">
-                                    <input
-                                        type="checkbox"
-                                        value="AIN Compression"
-                                        {...register("diagnoses")}
-                                        className=" mr-1"
-                                    />
-                                    AIN Compression
-                                </label>
-                            </>
-                        )}
+                        {diagnosisEnum.map((diagnosis) => (
+                            <label className="block" key={diagnosis}>
+                                <input
+                                    type="checkbox"
+                                    value={diagnosis}
+                                    {...register("diagnoses")}
+                                    className=" mr-1"
+                                />
+                                {diagnosis}
+                            </label>
+                        ))}
+                    </div>
+                    <div>
+                        追蹤問卷:
+                        {questionnaireEnum.map((questionnaire) => (
+                            <label className="block" key={questionnaire}>
+                                <input
+                                    type="checkbox"
+                                    value={questionnaire}
+                                    {...register("followingQuestionnaires")}
+                                    className=" mr-1"
+                                />
+                                {questionnaire}
+                            </label>
+                        ))}
                     </div>
                 </fieldset>
-                {!disabled && (
-                    <input
-                        type="submit"
-                        className="mt-2 cursor-pointer bg-blue-600 p-2 text-white"
-                    />
-                )}
+                <input
+                    type="submit"
+                    className="mt-2 cursor-pointer bg-blue-600 p-2 text-white"
+                />
             </form>
             <Toaster />
         </>
