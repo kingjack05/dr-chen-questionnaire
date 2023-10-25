@@ -3,6 +3,7 @@ import { db } from "../db"
 import { createTRPCRouter, publicProcedure } from "../trpcInstance"
 import { insertPatientSchema, patient } from "./schema"
 import { eq } from "drizzle-orm"
+import { ListObjectsV2Command } from "@aws-sdk/client-s3"
 
 export const patientRouter = createTRPCRouter({
     patientById: publicProcedure.input(z.number()).query(async (req) => {
@@ -42,4 +43,17 @@ export const patientRouter = createTRPCRouter({
                 console.log(error)
             }
         }),
+    getFiles: publicProcedure.query(async ({ ctx }) => {
+        const { s3 } = ctx
+        const command = new ListObjectsV2Command({ Bucket: "reason" })
+        let listObjectsOutput
+        try {
+            listObjectsOutput = await s3.send(command)
+            console.log(listObjectsOutput)
+        } catch (error) {
+            console.log(error)
+        }
+
+        return listObjectsOutput?.Contents ?? []
+    }),
 })

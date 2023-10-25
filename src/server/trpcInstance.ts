@@ -28,12 +28,41 @@ type CreateAstroContextOptions = Partial<{
     resHeaders: Headers
 }>
 
-const createContext = async (options: CreateAstroContextOptions) => {
+/** Replace this with an object if you want to pass things to `createContextInner`. */
+type CreateContextOptions = {
+    userId?: string
+}
+
+import { s3 } from "./s3Instance"
+/**
+ * This helper generates the "internals" for a tRPC context. If you need to use it, you can export
+ * it from here.
+ *
+ * Examples of things you may need it for:
+ * - testing, so we don't have to mock Next.js' req/res
+ * - tRPC's `createSSGHelpers`, where we don't have req/res
+ *
+ * @see https://create.t3.gg/en/usage/trpc#-serverapitrpcts
+ */
+const createInnerTRPCContext = (opts: CreateContextOptions) => {
+    return { ...opts, s3 }
+}
+
+/**
+ * This is the actual context you will use in your router. It will be used to process every request
+ * that goes through your tRPC endpoint.
+ *
+ * @see https://trpc.io/docs/context
+ * @see https://trpc.io/docs/server/context#inner-and-outer-context
+ */
+export const createTRPCContext = (opts: CreateAstroContextOptions) => {
+    const contextInner = createInnerTRPCContext({})
     return {
-        ...options,
+        ...contextInner,
+        ...opts,
     }
 }
-type Context = inferAsyncReturnType<typeof createContext>
+type Context = inferAsyncReturnType<typeof createTRPCContext>
 
 /**
  * 2. INITIALIZATION
