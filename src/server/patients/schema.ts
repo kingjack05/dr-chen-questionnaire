@@ -32,15 +32,17 @@ export const questionnairePgEnum = pgEnum("questionnaire", questionnaireEnum)
 export const FileDataZodObj = z.object({
     url: z.string(),
     date: z.string(),
+    type: z.string(),
+    extension: z.string(),
 })
-type FileData = z.infer<typeof FileDataZodObj>
+export type FileData = z.infer<typeof FileDataZodObj>
 export const patient = pgTable(
     "patient",
     {
         id: integer("id").primaryKey(),
         name: text("name").notNull(),
         gender: text("gender", { enum: genderEnum }),
-        birthday: date("birthday").notNull(),
+        birthday: date("birthday", { mode: "date" }).notNull(),
         diagnoses: text("diagnoses", { enum: diagnosisEnum }).array(),
         followingQuestionnaires: text("followingQuestionnaires", {
             enum: questionnaireEnum,

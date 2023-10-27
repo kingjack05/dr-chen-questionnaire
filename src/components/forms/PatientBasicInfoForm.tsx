@@ -99,6 +99,14 @@ export const PatientBasicInfoForm = ({
                             className="input ml-2 bg-white"
                         />
                     </label>
+                    <label className="block">
+                        生日:
+                        <input
+                            type="date"
+                            {...register("birthday", { valueAsDate: true })}
+                            className="ml-4"
+                        />
+                    </label>
                     <div>
                         主診斷:
                         {disabled ? (

@@ -105,7 +105,7 @@ export const AddPatientForm = ({ onSubmit }: PropTypes) => {
                         生日:
                         <input
                             type="date"
-                            {...register("birthday")}
+                            {...register("birthday", { valueAsDate: true })}
                             className="ml-4"
                         />
                     </label>

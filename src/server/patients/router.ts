@@ -72,7 +72,7 @@ export const patientRouter = createTRPCRouter({
     addFileData: publicProcedure
         .input(FileDataZodObj.and(z.object({ id: z.number() })))
         .mutation(async ({ input }) => {
-            const { url, date, id } = input
+            const { url, date, type, extension, id } = input
             try {
                 const originalData = await db.query.patient.findFirst({
                     where: (patient, { eq }) => eq(patient.id, id),
@@ -82,7 +82,12 @@ export const patientRouter = createTRPCRouter({
                     : []
                 await db
                     .update(patient)
-                    .set({ files: [...originalFiles, { url, date }] })
+                    .set({
+                        files: [
+                            ...originalFiles,
+                            { url, date, type, extension },
+                        ],
+                    })
                     .where(eq(patient.id, id))
             } catch (error) {
                 console.log(error)

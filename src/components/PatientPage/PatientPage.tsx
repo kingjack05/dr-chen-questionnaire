@@ -10,6 +10,7 @@ import { PatientBasicInfoForm } from "../forms/PatientBasicInfoForm"
 import { trpc } from "../trpc"
 import { QueryContextProvider } from "../Providers/QueryContext"
 import { AddPatientForm } from "../forms/AddPatientForm"
+import type { FileData } from "../../server/patients/schema"
 
 const PatientPageWithoutProvider = () => {
     const queryParameters = new URLSearchParams(window.location.search)
@@ -21,6 +22,23 @@ const PatientPageWithoutProvider = () => {
     const patientData = trpc.patient.patientById.useQuery(
         Number(patientID),
     ).data
+    const refetchPatientData = trpc.patient.patientById.useQuery(
+        Number(patientID),
+    ).refetch
+
+    const patientFiles = patientData?.files
+        ? (patientData.files as FileData[])
+        : ([] as FileData[])
+    type FilesDateMap = {
+        [date: string]: Array<{ url: string; type: string; extension: string }>
+    }
+    // https://stackoverflow.com/questions/73253207/typeerror-products-groupby-is-not-a-function
+    const patientFilesDateMap = patientFiles.reduce((acc, file) => {
+        const { url, type, extension } = file
+        ;(acc[file.date] = acc[file.date] || []).push({ url, type, extension })
+        return acc
+    }, {} as FilesDateMap)
+
     const editPatient = trpc.patient.editPatient.useMutation()
 
     const [basicInfoFormDisabled, setBasicInfoFormDisabled] = useState(true)
@@ -58,14 +76,19 @@ const PatientPageWithoutProvider = () => {
                     <div className="mt-2">
                         <PatientBasicInfoForm
                             disabled={basicInfoFormDisabled}
-                            onSubmit={(v) => {
-                                editPatient.mutate(v)
+                            onSubmit={async (v) => {
+                                await editPatient.mutate(v)
+                                await refetchPatientData()
                             }}
                             defaultValues={{
                                 ...patientData,
                                 lastEdited: patientData.lastEdited
                                     ? new Date(patientData.lastEdited)
                                     : new Date(),
+                                // @ts-ignore defaultValue only accepts strings
+                                birthday: new Date(patientData.birthday)
+                                    .toISOString()
+                                    .substring(0, 10),
                             }}
                         />
                     </div>
@@ -101,22 +124,24 @@ const PatientPageWithoutProvider = () => {
                         <h6>檔案</h6>
                         <UploadPopover id={patientID} />
                     </div>
-
-                    <div className="mb-2 text-gray-600">2023.09.14</div>
-                    <div className="flex">
-                        <img
-                            className="h-20 w-20"
-                            src="https://prod-images-static.radiopaedia.org/images/8011971/de0f7a7fa8561dc31e023e21a554a3_gallery.jpg"
-                        />
-                        <img
-                            className="h-20 w-20"
-                            src="https://prod-images-static.radiopaedia.org/images/54243726/Normal_R_Hand_big_gallery.jpeg"
-                        />
-                        <img
-                            className="h-20 w-20"
-                            src="https://www.johnericksonmd.com/cms/wp-content/uploads/2015/07/hand-OA.jpg"
-                        />
-                    </div>
+                    {Object.entries(patientFilesDateMap).map((obj) => (
+                        <div key={obj[0]}>
+                            <div className="mb-2 text-gray-600">{obj[0]}</div>
+                            {obj[1].map(({ url, type }) => (
+                                <div key={url}>
+                                    {type === "image" && (
+                                        <img src={url} className="w-18 h-24" />
+                                    )}
+                                    {type === "video" && (
+                                        <video
+                                            src={url}
+                                            className="w-18 h-24"
+                                        />
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    ))}
                 </div>
                 <div className=" p-4 sm:w-1/3">
                     <div className="flex">
@@ -302,6 +327,7 @@ const UploadProgressIndicator = ({
     const [uploadState, setUploadState] = useState("idle")
     const [uploadProgress, setUploadProgress] = useState(0)
 
+    const refetchPatientData = trpc.patient.patientById.useQuery(id).refetch()
     const getUploadPresignedUrl =
         trpc.patient.getStandardUploadPresignedUrl.useMutation()
     const addPatientFileData = trpc.patient.addFileData.useMutation()
@@ -324,19 +350,27 @@ const UploadProgressIndicator = ({
                                     return
                                 }
                                 setUploadProgress(
-                                    (100 * progressEvent.loaded) /
-                                        progressEvent.total,
+                                    Math.round(
+                                        (100 * progressEvent.loaded) /
+                                            progressEvent.total,
+                                    ),
                                 )
                             },
                         })
                         .then((response) => {
                             setUploadState("done")
                         })
+                    const type = file.type.split("/")[0]
+                    const extension = file.type.split("/")[1]
+                    console.log(type, extension)
                     await addPatientFileData.mutateAsync({
                         date,
                         id,
                         url: `https://reason.s3.us-west-004.backblazeb2.com/${key}`,
+                        type,
+                        extension,
                     })
+                    await refetchPatientData
                 } catch (error) {
                     console.log(error)
                     setUploadState("error")
