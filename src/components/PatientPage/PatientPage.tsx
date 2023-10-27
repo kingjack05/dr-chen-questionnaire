@@ -1,8 +1,11 @@
 import { useStore } from "@nanostores/react"
 import { $patientIDAndNames } from "./store"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Combobox, Popover, Dialog } from "@headlessui/react"
-import { useForm } from "react-hook-form"
+import { useForm, type SubmitHandler } from "react-hook-form"
+import axios from "axios"
+import { v4 as uuidv4 } from "uuid"
+
 import { PatientBasicInfoForm } from "../forms/PatientBasicInfoForm"
 import { trpc } from "../trpc"
 import { QueryContextProvider } from "../Providers/QueryContext"
@@ -95,8 +98,8 @@ const PatientPageWithoutProvider = () => {
                 </div>
                 <div className=" p-4 sm:w-1/3">
                     <div className="relative flex">
-                        <h6>照片</h6>
-                        <UploadPicPopover />
+                        <h6>檔案</h6>
+                        <UploadPopover id={patientID} />
                     </div>
 
                     <div className="mb-2 text-gray-600">2023.09.14</div>
@@ -285,7 +288,91 @@ const QuestionnaireScoreAccordion = ({
     )
 }
 
-const UploadPicPopover = () => {
+const UploadProgressIndicator = ({
+    file,
+    startUpload,
+    date,
+    id,
+}: {
+    file: File
+    startUpload: boolean
+    date: string
+    id: number
+}) => {
+    const [uploadState, setUploadState] = useState("idle")
+    const [uploadProgress, setUploadProgress] = useState(0)
+
+    const getUploadPresignedUrl =
+        trpc.patient.getStandardUploadPresignedUrl.useMutation()
+    const addPatientFileData = trpc.patient.addFileData.useMutation()
+
+    useEffect(() => {
+        if (startUpload === true && uploadState === "idle") {
+            setUploadState("uploading")
+            const upload = async () => {
+                // https://nkrkn.me/writing/t3-s3
+                try {
+                    const key = uuidv4()
+                    const uploadUrl = await getUploadPresignedUrl.mutateAsync({
+                        key,
+                    })
+                    await axios
+                        .put(uploadUrl, file.slice(), {
+                            headers: { "Content-Type": file.type },
+                            onUploadProgress(progressEvent) {
+                                if (!progressEvent.total) {
+                                    return
+                                }
+                                setUploadProgress(
+                                    (100 * progressEvent.loaded) /
+                                        progressEvent.total,
+                                )
+                            },
+                        })
+                        .then((response) => {
+                            setUploadState("done")
+                        })
+                    await addPatientFileData.mutateAsync({
+                        date,
+                        id,
+                        url: `https://reason.s3.us-west-004.backblazeb2.com/${key}`,
+                    })
+                } catch (error) {
+                    console.log(error)
+                    setUploadState("error")
+                }
+            }
+            upload()
+        }
+    }, [startUpload])
+
+    return (
+        <div className="flex flex-col">
+            <div>{uploadState}</div>
+            <div>
+                {file.type.split("/")[0] === "image" && (
+                    <img
+                        src={window.URL.createObjectURL(file)}
+                        className="w-18 h-24"
+                    />
+                )}
+                {file.type.split("/")[0] === "video" && (
+                    <video
+                        src={window.URL.createObjectURL(file)}
+                        className="w-18 h-24"
+                    />
+                )}
+            </div>
+            <div>{uploadProgress}%</div>
+        </div>
+    )
+}
+
+const UploadPopover = ({ id }: { id: string }) => {
+    const [startUpload, setStartUpload] = useState(false)
+    const [date, setDate] = useState(new Date().toISOString().substring(0, 10))
+    const [filesToUpload, setFilesToUpload] = useState<Array<File>>([])
+
     return (
         <>
             <Popover className="relative">
@@ -304,27 +391,68 @@ const UploadPicPopover = () => {
                                     <path d="M23.5 22H23v-2h.5a4.5 4.5 0 0 0 .36-9H23l-.1-.82a7 7 0 0 0-13.88 0L9 11h-.86a4.5 4.5 0 0 0 .36 9H9v2h-.5A6.5 6.5 0 0 1 7.2 9.14a9 9 0 0 1 17.6 0A6.5 6.5 0 0 1 23.5 22Z" />
                                 </svg>
                             </Popover.Button>
-                            <Popover.Panel className="absolute bg-gray-100">
-                                <form>
-                                    <input type="file" />
-
-                                    <label>
-                                        <span className=" mr-1 mt-2 inline-block">
-                                            日期:
-                                        </span>
-                                        <input
-                                            type="date"
-                                            defaultValue={new Date()
-                                                .toISOString()
-                                                .substring(0, 10)}
-                                        />
-                                    </label>
-                                    <div className="mt-4 flex justify-end">
-                                        <button className="btn" type="submit">
-                                            上傳照片
+                            <Popover.Panel className="absolute z-10 bg-gray-100">
+                                <input
+                                    type="file"
+                                    multiple
+                                    accept="image/*, video/*"
+                                    onChange={(e) => {
+                                        if (!e.target.files) {
+                                            return
+                                        }
+                                        let toAdd = Array.from(e.target.files)
+                                        setFilesToUpload([
+                                            ...filesToUpload,
+                                            ...toAdd,
+                                        ])
+                                    }}
+                                />
+                                <label>
+                                    <span className=" mr-1 mt-2 inline-block">
+                                        日期:
+                                    </span>
+                                    <input
+                                        type="date"
+                                        value={date}
+                                        onChange={(e) => {
+                                            setDate(e.target.value)
+                                        }}
+                                    />
+                                </label>
+                                <div className="mt-4 flex">
+                                    <div className="flex-grow">
+                                        <button
+                                            className="btn"
+                                            onClick={() => {
+                                                setStartUpload(true)
+                                                setTimeout(() => {
+                                                    setStartUpload(false)
+                                                }, 500)
+                                            }}
+                                        >
+                                            開始上傳
                                         </button>
                                     </div>
-                                </form>
+                                    <button
+                                        className="btn"
+                                        onClick={() => {
+                                            setFilesToUpload([])
+                                        }}
+                                    >
+                                        清除
+                                    </button>
+                                </div>
+                                <div className="flex flex-wrap">
+                                    {filesToUpload.map((file) => (
+                                        <UploadProgressIndicator
+                                            file={file}
+                                            startUpload={startUpload}
+                                            date={date}
+                                            id={Number(id)}
+                                            key={file.name}
+                                        />
+                                    ))}
+                                </div>
                             </Popover.Panel>
                         </>
                     )

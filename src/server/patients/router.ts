@@ -1,9 +1,10 @@
 import { z } from "zod"
 import { db } from "../db"
 import { createTRPCRouter, publicProcedure } from "../trpcInstance"
-import { insertPatientSchema, patient } from "./schema"
+import { FileDataZodObj, insertPatientSchema, patient } from "./schema"
 import { eq } from "drizzle-orm"
-import { ListObjectsV2Command } from "@aws-sdk/client-s3"
+import { ListObjectsV2Command, PutObjectCommand } from "@aws-sdk/client-s3"
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 
 export const patientRouter = createTRPCRouter({
     patientById: publicProcedure.input(z.number()).query(async (req) => {
@@ -49,11 +50,42 @@ export const patientRouter = createTRPCRouter({
         let listObjectsOutput
         try {
             listObjectsOutput = await s3.send(command)
-            console.log(listObjectsOutput)
         } catch (error) {
             console.log(error)
         }
 
         return listObjectsOutput?.Contents ?? []
     }),
+    getStandardUploadPresignedUrl: publicProcedure
+        .input(z.object({ key: z.string() }))
+        .mutation(async ({ ctx, input }) => {
+            const { key } = input
+            const { s3 } = ctx
+
+            const putObjectCommand = new PutObjectCommand({
+                Bucket: "reason",
+                Key: key,
+            })
+
+            return await getSignedUrl(s3, putObjectCommand)
+        }),
+    addFileData: publicProcedure
+        .input(FileDataZodObj.and(z.object({ id: z.number() })))
+        .mutation(async ({ input }) => {
+            const { url, date, id } = input
+            try {
+                const originalData = await db.query.patient.findFirst({
+                    where: (patient, { eq }) => eq(patient.id, id),
+                })
+                const originalFiles = originalData?.files
+                    ? originalData?.files
+                    : []
+                await db
+                    .update(patient)
+                    .set({ files: [...originalFiles, { url, date }] })
+                    .where(eq(patient.id, id))
+            } catch (error) {
+                console.log(error)
+            }
+        }),
 })

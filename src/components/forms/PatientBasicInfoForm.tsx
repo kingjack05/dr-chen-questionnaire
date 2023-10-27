@@ -5,7 +5,7 @@ import toast, { Toaster } from "react-hot-toast"
 
 import { insertPatientSchema } from "../../server/patients/schema"
 
-type TForm = z.infer<typeof insertPatientSchema>
+type TForm = Omit<z.infer<typeof insertPatientSchema>, "files">
 
 type PropTypes = {
     disabled: boolean
@@ -23,10 +23,12 @@ export const PatientBasicInfoForm = ({
         handleSubmit,
         watch,
         formState: { errors },
+        // @ts-ignore
     } = useForm<TForm>({
         defaultValues,
         // zodResolver zod version issues: https://github.com/colinhacks/zod/issues/2663, https://github.com/orgs/react-hook-form/discussions/10861
-        // @ts-ignore can't figure it out so just ignoring it for now https://github.com/react-hook-form/resolvers/issues/451
+        // can't figure it out so just ignoring it for now https://github.com/react-hook-form/resolvers/issues/451
+        // @ts-ignore
         resolver: zodResolver(insertPatientSchema),
     })
 

@@ -6,6 +6,7 @@ import {
     date,
     timestamp,
     index,
+    json,
     pgEnum,
 } from "drizzle-orm/pg-core"
 import { createInsertSchema } from "drizzle-zod"
@@ -28,6 +29,11 @@ export const genderPgEnum = pgEnum("gender", genderEnum)
 export const diagnosisPgEnum = pgEnum("diagnosis", diagnosisEnum)
 export const questionnairePgEnum = pgEnum("questionnaire", questionnaireEnum)
 
+export const FileDataZodObj = z.object({
+    url: z.string(),
+    date: z.string(),
+})
+type FileData = z.infer<typeof FileDataZodObj>
 export const patient = pgTable(
     "patient",
     {
@@ -39,6 +45,7 @@ export const patient = pgTable(
         followingQuestionnaires: text("followingQuestionnaires", {
             enum: questionnaireEnum,
         }).array(),
+        files: json("files").$type<FileData>().array(),
         lastEdited: timestamp("lastEdited").defaultNow(),
     },
     (table) => {
