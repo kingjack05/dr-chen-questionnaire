@@ -1,0 +1,474 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "id": "1f35d59c-5219-4ee6-8a3c-052c50da0417",
+  "prevId": "c06f9509-6060-45aa-b5b8-15e519e99ea4",
+  "tables": {
+    "michiganHandOutcomeResponse": {
+      "name": "michiganHandOutcomeResponse",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "date": {
+          "name": "date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "patientId": {
+          "name": "patientId",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q1": {
+          "name": "q1",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q2": {
+          "name": "q2",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q3": {
+          "name": "q3",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q4": {
+          "name": "q4",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q5": {
+          "name": "q5",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q6": {
+          "name": "q6",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q7": {
+          "name": "q7",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q8": {
+          "name": "q8",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q9": {
+          "name": "q9",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q10": {
+          "name": "q10",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q11": {
+          "name": "q11",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q12": {
+          "name": "q12",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q13": {
+          "name": "q13",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q14": {
+          "name": "q14",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q15": {
+          "name": "q15",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q16": {
+          "name": "q16",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q17": {
+          "name": "q17",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q18": {
+          "name": "q18",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q19": {
+          "name": "q19",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q20": {
+          "name": "q20",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q21": {
+          "name": "q21",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q22": {
+          "name": "q22",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q23": {
+          "name": "q23",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q24": {
+          "name": "q24",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q25": {
+          "name": "q25",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q26": {
+          "name": "q26",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q27": {
+          "name": "q27",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q28": {
+          "name": "q28",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q29": {
+          "name": "q29",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q30": {
+          "name": "q30",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q31": {
+          "name": "q31",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q32": {
+          "name": "q32",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q33": {
+          "name": "q33",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q34": {
+          "name": "q34",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q35": {
+          "name": "q35",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q36": {
+          "name": "q36",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q37": {
+          "name": "q37",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q38": {
+          "name": "q38",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q39": {
+          "name": "q39",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q40": {
+          "name": "q40",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q41": {
+          "name": "q41",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q42": {
+          "name": "q42",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q43": {
+          "name": "q43",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q44": {
+          "name": "q44",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q45": {
+          "name": "q45",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q46": {
+          "name": "q46",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q47": {
+          "name": "q47",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q48": {
+          "name": "q48",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q49": {
+          "name": "q49",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q50": {
+          "name": "q50",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q51": {
+          "name": "q51",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q52": {
+          "name": "q52",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q53": {
+          "name": "q53",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q54": {
+          "name": "q54",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q55": {
+          "name": "q55",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q56": {
+          "name": "q56",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "q57": {
+          "name": "q57",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "michiganHandOutcomeResponse_patientId_patient_id_fk": {
+          "name": "michiganHandOutcomeResponse_patientId_patient_id_fk",
+          "tableFrom": "michiganHandOutcomeResponse",
+          "tableTo": "patient",
+          "columnsFrom": [
+            "patientId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "patient": {
+      "name": "patient",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gender": {
+          "name": "gender",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "birthday": {
+          "name": "birthday",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "diagnoses": {
+          "name": "diagnoses",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "followingQuestionnaires": {
+          "name": "followingQuestionnaires",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "files": {
+          "name": "files",
+          "type": "json[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lastEdited": {
+          "name": "lastEdited",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "nameIdx": {
+          "name": "nameIdx",
+          "columns": [
+            "name"
+          ],
+          "isUnique": false
+        },
+        "lastEditedIdx": {
+          "name": "lastEditedIdx",
+          "columns": [
+            "lastEdited"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  }
+}

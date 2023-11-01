@@ -52,6 +52,13 @@ export const CheckPatientIdentityPageWithoutProvider = () => {
                                     return
                                 }
                                 toast.success("登入成功")
+                                window.open(
+                                    `/questionnaires?id=${
+                                        result.id
+                                    }&followingQuestionnaires=${result.followingQuestionnaires?.join(
+                                        "+",
+                                    )}`,
+                                )
                                 console.log(result)
                             }}
                         >

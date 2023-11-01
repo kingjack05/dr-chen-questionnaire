@@ -45,7 +45,7 @@ module.exports = {
         },
     },
     plugins: [
-        function ({ addBase, addComponents, theme }) {
+        function ({ addBase, addComponents, addUtilities, theme }) {
             addBase({
                 h1: { fontSize: "54px", lineHeight: "64px", fontWeight: "300" },
                 h2: { fontSize: "42px", lineHeight: "48px", fontWeight: "300" },
@@ -71,6 +71,10 @@ module.exports = {
                         borderColor: "transparent",
                     },
                 },
+            })
+            addUtilities({
+                ".vertical-writing-rl": { "writing-mode": "vertical-rl" },
+                ".vertical-writing-lr": { "writing-mode": "vertical-lr" },
             })
         },
     ],

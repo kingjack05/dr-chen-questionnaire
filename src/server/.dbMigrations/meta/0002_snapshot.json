@@ -1,0 +1,89 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "id": "c06f9509-6060-45aa-b5b8-15e519e99ea4",
+  "prevId": "61d6ab78-0ce9-43e9-9b82-7a546e8baa27",
+  "tables": {
+    "patient": {
+      "name": "patient",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "gender": {
+          "name": "gender",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "birthday": {
+          "name": "birthday",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "diagnoses": {
+          "name": "diagnoses",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "followingQuestionnaires": {
+          "name": "followingQuestionnaires",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "files": {
+          "name": "files",
+          "type": "json[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lastEdited": {
+          "name": "lastEdited",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "nameIdx": {
+          "name": "nameIdx",
+          "columns": [
+            "name"
+          ],
+          "isUnique": false
+        },
+        "lastEditedIdx": {
+          "name": "lastEditedIdx",
+          "columns": [
+            "lastEdited"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "_meta": {
+    "schemas": {},
+    "tables": {},
+    "columns": {}
+  }
+}

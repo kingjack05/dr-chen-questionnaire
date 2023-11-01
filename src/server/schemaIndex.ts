@@ -1,4 +1,4 @@
 import { patient } from "./patients/schema"
-import { michiganHandOutcome } from "./questionnaire/schema"
+import { michiganHandOutcomeResponse } from "./questionnaire/schema"
 
-export { patient, michiganHandOutcome }
+export { patient, michiganHandOutcomeResponse }
