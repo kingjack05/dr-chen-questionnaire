@@ -39,14 +39,14 @@ export const PatientBasicInfoForm = ({
                     (data) => {
                         try {
                             onSubmit(data)
-                            toast.success("編輯成功")
+                            toast.success("儲存成功")
                         } catch (error) {
-                            toast.error("編輯失敗")
+                            toast.error("儲存失敗")
                         }
                     },
                     (e) => {
                         console.log(e)
-                        toast.error("編輯失敗")
+                        toast.error("儲存失敗")
                     },
                 )}
             >
@@ -97,6 +97,7 @@ export const PatientBasicInfoForm = ({
                         <input
                             {...register("id")}
                             className="input ml-2 bg-white"
+                            disabled
                         />
                     </label>
                     <label className="block">
@@ -147,10 +148,9 @@ export const PatientBasicInfoForm = ({
                     </div>
                 </fieldset>
                 {!disabled && (
-                    <input
-                        type="submit"
-                        className="mt-2 cursor-pointer bg-blue-600 p-2 text-white"
-                    />
+                    <button type="submit" className="btn mt-2">
+                        儲存
+                    </button>
                 )}
             </form>
             <Toaster />

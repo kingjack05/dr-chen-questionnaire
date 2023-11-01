@@ -5,12 +5,13 @@ import { Combobox, Popover, Dialog } from "@headlessui/react"
 import { useForm, type SubmitHandler } from "react-hook-form"
 import axios from "axios"
 import { v4 as uuidv4 } from "uuid"
+import toast, { Toaster } from "react-hot-toast"
 
 import { PatientBasicInfoForm } from "../forms/PatientBasicInfoForm"
 import { trpc } from "../trpc"
 import { QueryContextProvider } from "../Providers/QueryContext"
 import { AddPatientForm } from "../forms/AddPatientForm"
-import type { FileData } from "../../server/patients/schema"
+import { questionnaireEnum, type FileData } from "../../server/patients/schema"
 
 const PatientPageWithoutProvider = () => {
     const queryParameters = new URLSearchParams(window.location.search)
@@ -146,7 +147,22 @@ const PatientPageWithoutProvider = () => {
                 <div className=" p-4 sm:w-1/3">
                     <div className="flex">
                         <h6 className="flex-grow">問卷資料</h6>
-                        <QuestionnaireSettingPopover />
+                        <QuestionnaireSettingPopover
+                            defaultValues={{
+                                followingQuestionnaires:
+                                    patientData.followingQuestionnaires ?? [],
+                            }}
+                            onSubmit={async (data) => {
+                                await editPatient.mutateAsync({
+                                    id: patientData.id,
+                                    name: patientData.name,
+                                    birthday: patientData.birthday,
+                                    followingQuestionnaires:
+                                        data.followingQuestionnaires,
+                                })
+                                await refetchPatientData()
+                            }}
+                        />
                     </div>
                     <div>
                         <div className="mb-2 mt-1 text-gray-600">
@@ -202,6 +218,7 @@ const PatientPageWithoutProvider = () => {
                     </div>
                 </div>
             </div>
+            <Toaster />
         </>
     )
 }
@@ -496,18 +513,23 @@ const UploadPopover = ({ id }: { id: string }) => {
     )
 }
 
+type Questionnaires = (typeof questionnaireEnum)[number]
 type QuestionnaireSettingInputs = {
-    trackingQuestionnaires: string[]
+    followingQuestionnaires: Questionnaires[]
 }
-
-const QuestionnaireSettingPopover = () => {
+const QuestionnaireSettingPopover = ({
+    defaultValues,
+    onSubmit,
+}: {
+    defaultValues: QuestionnaireSettingInputs
+    onSubmit: SubmitHandler<QuestionnaireSettingInputs>
+}) => {
     const {
         register,
         handleSubmit,
-        watch,
         formState: { errors },
     } = useForm<QuestionnaireSettingInputs>({
-        defaultValues: { trackingQuestionnaires: ["MHOQ"] },
+        defaultValues,
     })
 
     return (
@@ -529,87 +551,40 @@ const QuestionnaireSettingPopover = () => {
                                 </svg>
                             </Popover.Button>
                             <Popover.Panel className="absolute right-0 w-40 bg-gray-100">
-                                <form>
-                                    <label className="block">
-                                        <input
-                                            {...register(
-                                                "trackingQuestionnaires",
-                                            )}
-                                            type="checkbox"
-                                            value="MHOQ"
-                                        />
-                                        MHOQ
-                                    </label>
-                                    <label className="block">
-                                        <input
-                                            {...register(
-                                                "trackingQuestionnaires",
-                                            )}
-                                            type="checkbox"
-                                            value="SF-36"
-                                        />
-                                        SF-36
-                                    </label>
-                                    <label className="block">
-                                        <input
-                                            {...register(
-                                                "trackingQuestionnaires",
-                                            )}
-                                            type="checkbox"
-                                            value="SF-12"
-                                        />
-                                        SF-12
-                                    </label>
-                                    <label className="block">
-                                        <input
-                                            {...register(
-                                                "trackingQuestionnaires",
-                                            )}
-                                            type="checkbox"
-                                            value="WHOQOL-BREF"
-                                        />
-                                        WHOQOL-BREF
-                                    </label>
-                                    <label className="block">
-                                        <input
-                                            {...register(
-                                                "trackingQuestionnaires",
-                                            )}
-                                            type="checkbox"
-                                            value="BSRS"
-                                        />
-                                        BSRS
-                                    </label>
-                                    <label className="block">
-                                        <input
-                                            {...register(
-                                                "trackingQuestionnaires",
-                                            )}
-                                            type="checkbox"
-                                            value="DASH"
-                                        />
-                                        DASH
-                                    </label>
-                                    <label className="block">
-                                        <input
-                                            {...register(
-                                                "trackingQuestionnaires",
-                                            )}
-                                            type="checkbox"
-                                            value="Quick-DASH"
-                                        />
-                                        Quick-DASH
-                                    </label>
-                                    <label className="block">
-                                        <input
-                                            {...register(
-                                                "trackingQuestionnaires",
-                                            )}
-                                            type="checkbox"
-                                            value="BCTQ"
-                                        />
-                                        BCTQ
-                                    </label>
+                                設定追蹤問卷
+                                <form
+                                    onSubmit={handleSubmit(
+                                        (data) => {
+                                            try {
+                                                onSubmit(data)
+                                                toast.success("儲存成功")
+                                            } catch (error) {
+                                                toast.error("儲存失敗")
+                                            }
+                                        },
+                                        (e) => {
+                                            console.log(e)
+                                            toast.error("儲存失敗")
+                                        },
+                                    )}
+                                >
+                                    {questionnaireEnum.map((questionnaire) => {
+                                        return (
+                                            <label className="block">
+                                                <input
+                                                    {...register(
+                                                        "followingQuestionnaires",
+                                                    )}
+                                                    type="checkbox"
+                                                    value={questionnaire}
+                                                />
+                                                {questionnaire}
+                                            </label>
+                                        )
+                                    })}
+                                    <button type="submit" className="btn mt-2">
+                                        儲存
+                                    </button>
                                 </form>
                             </Popover.Panel>
                         </>
