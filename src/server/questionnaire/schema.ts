@@ -1,13 +1,12 @@
 import { pgTable, integer, serial, date, text } from "drizzle-orm/pg-core"
 import { patient } from "../patients/schema"
 
-const questions: {
+const michiganQuestions: {
     [qNum: string]: any
 } = {}
 for (let i = 1; i <= 57; i++) {
-    questions[`q${i}`] = integer(`q${i}`)
+    michiganQuestions[`q${i}`] = integer(`q${i}`)
 }
-
 export const michiganHandOutcomeResponse = pgTable(
     "michiganHandOutcomeResponse",
     {
@@ -16,7 +15,7 @@ export const michiganHandOutcomeResponse = pgTable(
         patientId: integer("patientId")
             .references(() => patient.id)
             .notNull(),
-        ...questions,
+        ...michiganQuestions,
         handedness: integer("handedness"),
         affectedSide: integer("affectedSide"),
         changedJob: integer("changedJob"),

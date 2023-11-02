@@ -415,6 +415,7 @@ export const MHO = ({ patientId }: MHOPropType) => {
                                         console.log(e)
                                     })
                             }}
+                            required
                         />
                     </label>
                     <label className="text-gray-600">
@@ -436,6 +437,7 @@ export const MHO = ({ patientId }: MHOPropType) => {
                                         console.log(e)
                                     })
                             }}
+                            required
                         />
                     </label>
                 </div>
@@ -477,6 +479,7 @@ const RadioGroup = ({
                                     ? true
                                     : false
                             }
+                            required
                         />
                         <div className="ml-1 mr-2 sm:hidden">{option}</div>
                     </label>
@@ -566,6 +569,7 @@ const QuestionRadio = <T,>({
                                         ? true
                                         : false
                                 }
+                                required
                             />
                             <div className="ml-1 mr-2">{option}</div>
                         </label>
