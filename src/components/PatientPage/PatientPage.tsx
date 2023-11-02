@@ -1,5 +1,3 @@
-import { useStore } from "@nanostores/react"
-import { $patientIDAndNames } from "./store"
 import { useEffect, useState } from "react"
 import { Combobox, Popover, Dialog } from "@headlessui/react"
 import { useForm, type SubmitHandler } from "react-hook-form"
@@ -232,12 +230,16 @@ export const PatientPage = () => {
 }
 
 const SearchBar = () => {
-    const patientIDAndNames = useStore($patientIDAndNames)
+    const patientIDAndNames =
+        trpc.patient.getPatientsIdAndName.useQuery().data ?? []
     const [query, setQuery] = useState("")
 
     const filteredPateints = query
         ? patientIDAndNames.filter((patient) => {
-              return patient.id.includes(query)
+              return (
+                  String(patient.id).includes(query) ||
+                  patient.name.includes(query)
+              )
           })
         : []
 
@@ -253,7 +255,7 @@ const SearchBar = () => {
                         <Combobox.Input
                             onChange={(e) => setQuery(e.target.value)}
                             className="peer mb-2 mr-3 mt-2 w-full border-b border-gray-300 bg-transparent px-8 py-1 leading-tight text-gray-700 focus:border-gray-500 focus:outline-none"
-                            placeholder="輸入病歷號"
+                            placeholder="輸入病歷號或姓名"
                         />
                         <svg
                             xmlns="http://www.w3.org/2000/svg"

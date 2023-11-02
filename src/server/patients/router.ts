@@ -23,8 +23,13 @@ export const patientRouter = createTRPCRouter({
             })
             return result
         }),
-    patients: publicProcedure.query(async () => {
-        const patients = await db.query.patient.findMany()
+    getPatientsIdAndName: publicProcedure.query(async () => {
+        const patients = await db.query.patient.findMany({
+            columns: {
+                id: true,
+                name: true,
+            },
+        })
         return patients
     }),
     patientLastEdited: publicProcedure.query(async () => {
