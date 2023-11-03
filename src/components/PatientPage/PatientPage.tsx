@@ -15,9 +15,9 @@ const PatientPageWithoutProvider = () => {
     const queryParameters = new URLSearchParams(window.location.search)
     const patientLastEdited = trpc.patient.patientLastEdited.useQuery()
     const patientID =
-        queryParameters.get("id") ?? patientLastEdited.data?.id
-            ? String(patientLastEdited.data?.id)
-            : "10836635"
+        queryParameters.get("id") ??
+        String(patientLastEdited.data?.id) ??
+        "10836635"
     const patientData = trpc.patient.patientById.useQuery(
         Number(patientID),
     ).data

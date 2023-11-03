@@ -2,22 +2,41 @@ import { z } from "zod"
 
 import { db } from "../db"
 import { createTRPCRouter, publicProcedure } from "../trpcInstance"
-import { michiganHandOutcomeResponse } from "./schema"
+import {
+    bctResponse,
+    bsrsResponse,
+    dashResponse,
+    michiganHandOutcomeResponse,
+    qDashResponse,
+    sf12Response,
+    sf36Response,
+} from "./schema"
 import { eq, and } from "drizzle-orm"
+import type { PgTableWithColumns } from "drizzle-orm/pg-core"
+
+const QuestionnaireDBMap: { [questionnaire: string]: PgTableWithColumns<any> } =
+    {
+        MHO: michiganHandOutcomeResponse,
+        SF36: sf36Response,
+        SF12: sf12Response,
+        BCT: bctResponse,
+        WHOQOLbref: bctResponse,
+        BSRS: bsrsResponse,
+        DASH: dashResponse,
+        qDASH: qDashResponse,
+    }
 
 export const questionnaireRouter = createTRPCRouter({
     responseByPatient: publicProcedure
         .input(z.object({ patientId: z.number(), questionnaire: z.string() }))
         .query(async (req) => {
             const { patientId, questionnaire } = req.input
-            if (questionnaire === "MHO") {
-                const result =
-                    await db.query.michiganHandOutcomeResponse.findMany({
-                        where: (response, { eq }) =>
-                            eq(response.patientId, patientId),
-                    })
-                return result
-            }
+            const table = QuestionnaireDBMap[questionnaire]
+            const result = await db
+                .select()
+                .from(table)
+                .where(eq(table.patientId, patientId))
+            return result
         }),
     responseTodayByPatient: publicProcedure
         .input(
@@ -30,20 +49,15 @@ export const questionnaireRouter = createTRPCRouter({
         .query(async (req) => {
             const { patientId, questionnaire } = req.input
             const date = new Date()
-            if (questionnaire === "MHO") {
-                const result =
-                    await db.query.michiganHandOutcomeResponse.findFirst({
-                        where: (response, { eq, and }) =>
-                            and(
-                                eq(response.patientId, patientId),
-                                eq(response.date, date),
-                            ),
-                    })
-                if (!result) {
-                    return null
-                }
-                return result
-            }
+            const table = QuestionnaireDBMap[questionnaire]
+            const result = await db
+                .select()
+                .from(table)
+                .limit(1)
+                .where(
+                    and(eq(table.patientId, patientId), eq(table.date, date)),
+                )
+            return result[0]
         }),
     addResponse: publicProcedure
         .input(
@@ -55,16 +69,15 @@ export const questionnaireRouter = createTRPCRouter({
         )
         .mutation(async (req) => {
             const { questionnaire } = req.input
-            if (questionnaire === "MHO") {
-                try {
-                    const result = await db
-                        .insert(michiganHandOutcomeResponse)
-                        .values(req.input)
-                        .returning()
-                    return result
-                } catch (error) {
-                    console.log(error)
-                }
+            const table = QuestionnaireDBMap[questionnaire]
+            try {
+                const result = await db
+                    .insert(table)
+                    .values(req.input)
+                    .returning()
+                return result
+            } catch (error) {
+                console.log(error)
             }
         }),
     saveResponse: publicProcedure
@@ -79,23 +92,19 @@ export const questionnaireRouter = createTRPCRouter({
         )
         .mutation(async (req) => {
             const { patientId, questionnaire, qNum, value, date } = req.input
-            if (questionnaire === "MHO") {
-                try {
-                    await db
-                        .update(michiganHandOutcomeResponse)
-                        .set({ [qNum]: value })
-                        .where(
-                            and(
-                                eq(
-                                    michiganHandOutcomeResponse.patientId,
-                                    patientId,
-                                ),
-                                eq(michiganHandOutcomeResponse.date, date),
-                            ),
-                        )
-                } catch (error) {
-                    console.log(error)
-                }
+            const table = QuestionnaireDBMap[questionnaire]
+            try {
+                await db
+                    .update(table)
+                    .set({ [qNum]: value })
+                    .where(
+                        and(
+                            eq(table.patientId, patientId),
+                            eq(table.date, date),
+                        ),
+                    )
+            } catch (error) {
+                console.log(error)
             }
         }),
 })

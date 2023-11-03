@@ -98,10 +98,17 @@ export const QuestionnairesPage = () => {
                                     {completePercentage}%
                                 </div>
                             </div>
-                            <div>
-                                <button className="btn mt-3" type="submit">
-                                    提交
+                            <div className="flex items-center">
+                                <button className="btn mt-1" type="submit">
+                                    {questionnaireIndex + 1 <
+                                    followingQuestionnaires.length
+                                        ? "下一頁"
+                                        : "提交"}
                                 </button>
+                                <div className="ml-4 text-sm text-gray-500">
+                                    ({questionnaireIndex + 1}/
+                                    {followingQuestionnaires.length})
+                                </div>
                             </div>
                         </div>
                     </div>
