@@ -1,18 +1,58 @@
 import { useState } from "react"
-import { QueryContextProvider } from "../../components/Providers/QueryContext"
-import { MHO } from "./MHO"
 import { useStore } from "@nanostores/react"
+
+import { QueryContextProvider } from "../../components/Providers/QueryContext"
 import { $currentCompletedQs } from "./store"
+import { MHO } from "./MHO"
+import { SF36 } from "./SF36"
+import { SF12 } from "./SF12"
+import { BCT } from "./BCT"
+import { WHOQOLbref } from "./WHOQOLbref"
+import { BSRS } from "./BSRS"
+import { DASH } from "./DASH"
+import { QDASH } from "./QDASH"
 
 export const QuestionnairesPage = () => {
     const queryParameters = new URLSearchParams(window.location.search)
-    const [patientId, setPatientId] = useState(queryParameters.get("id"))
-    const [followingQuestionnaires, setFollowingQuestionnaires] = useState(
-        queryParameters.get("followingQuestionnaires"),
+    const [patientId] = useState(queryParameters.get("id"))
+    const [followingQuestionnaires] = useState(
+        queryParameters.get("followingQuestionnaires")?.split(" ") ?? [],
     )
-    const currentCompletedQs = useStore($currentCompletedQs)
-    const totalQs = 56
+    const [questionnaireIndex, setQuestionnaireIndex] = useState(0)
+    const currentQuestionnaire = followingQuestionnaires[questionnaireIndex]
+
+    const totalQsMap: { [questionnaire: string]: number } = {
+        MHO: 56,
+        SF36: 36,
+        SF12: 0,
+        BCT: 0,
+        WHOQOLbref: 0,
+        BSRS: 0,
+        DASH: 0,
+        qDASH: 0,
+    }
+    const currentCompletedQs =
+        followingQuestionnaires.reduce(
+            (acc, curVal, curIdx) =>
+                curIdx < questionnaireIndex ? acc + totalQsMap[curVal] : acc,
+            0,
+        ) + useStore($currentCompletedQs)
+    const totalQs = followingQuestionnaires.reduce(
+        (acc, curVal) => acc + totalQsMap[curVal],
+        0,
+    )
     const completePercentage = Math.floor((100 * currentCompletedQs) / totalQs)
+
+    const QuestionnaireMapper: { [questionnaire: string]: JSX.Element } = {
+        MHO: <MHO patientId={Number(patientId)} />,
+        SF36: <SF36 />,
+        SF12: <SF12 />,
+        BCT: <BCT />,
+        WHOQOLbref: <WHOQOLbref />,
+        BSRS: <BSRS />,
+        DASH: <DASH />,
+        qDASH: <QDASH />,
+    }
 
     return (
         <QueryContextProvider>
@@ -23,9 +63,17 @@ export const QuestionnairesPage = () => {
                 <form
                     onSubmit={(e) => {
                         e.preventDefault()
+                        if (
+                            questionnaireIndex ===
+                            followingQuestionnaires.length - 1
+                        ) {
+                            return
+                        }
+
+                        setQuestionnaireIndex(questionnaireIndex + 1)
                     }}
                 >
-                    <MHO patientId={Number(patientId)} />
+                    {QuestionnaireMapper[currentQuestionnaire]}
                     <div className="fixed bottom-0 left-0 h-24 w-full bg-gray-100 py-6">
                         <div className="flex sm:mx-auto sm:max-w-3xl">
                             <div className="flex-grow">
