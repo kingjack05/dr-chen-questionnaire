@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 import { trpc } from "../../components/trpc"
+import { $setCurrentCompletedQs } from "./store"
 
 type MHOPropType = {
     patientId: number
@@ -65,6 +66,14 @@ export const MHO = ({ patientId }: MHOPropType) => {
                     console.log(e)
                 })
         }
+        if (!MHOResponse.data) {
+            return
+        }
+        const completedQs = Object.entries(MHOResponse.data).reduce(
+            (acc, curVal) => (acc <= 56 ? acc + (curVal[1] ? 1 : 0) : 56), // max 56
+            -3, //exclude id, date and patientId
+        )
+        $setCurrentCompletedQs(completedQs)
         return () => {}
     }, [MHOResponse.data])
 

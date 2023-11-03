@@ -1,6 +1,8 @@
 import { useState } from "react"
 import { QueryContextProvider } from "../../components/Providers/QueryContext"
 import { MHO } from "./MHO"
+import { useStore } from "@nanostores/react"
+import { $currentCompletedQs } from "./store"
 
 export const QuestionnairesPage = () => {
     const queryParameters = new URLSearchParams(window.location.search)
@@ -8,6 +10,9 @@ export const QuestionnairesPage = () => {
     const [followingQuestionnaires, setFollowingQuestionnaires] = useState(
         queryParameters.get("followingQuestionnaires"),
     )
+    const currentCompletedQs = useStore($currentCompletedQs)
+    const totalQs = 56
+    const completePercentage = Math.floor((100 * currentCompletedQs) / totalQs)
 
     return (
         <QueryContextProvider>
@@ -26,11 +31,23 @@ export const QuestionnairesPage = () => {
                             <div className="flex-grow">
                                 <div className=" text-sm">進度</div>
                                 <div className="flex py-1">
-                                    <div className=" h-2 w-36 bg-blue-600"></div>
-                                    <div className=" h-2 w-24 bg-gray-200"></div>
+                                    <div
+                                        className="h-2 bg-blue-600"
+                                        style={{
+                                            width: 2.4 * completePercentage,
+                                        }}
+                                    ></div>
+                                    <div
+                                        className="h-2 bg-gray-200"
+                                        style={{
+                                            width:
+                                                2.4 *
+                                                (100 - completePercentage),
+                                        }}
+                                    ></div>
                                 </div>
                                 <div className=" text-xs text-gray-500">
-                                    66%
+                                    {completePercentage}%
                                 </div>
                             </div>
                             <div>
