@@ -1,4 +1,11 @@
-import { pgTable, integer, serial, date, text } from "drizzle-orm/pg-core"
+import {
+    pgTable,
+    integer,
+    serial,
+    date,
+    text,
+    boolean,
+} from "drizzle-orm/pg-core"
 import { patient } from "../patients/schema"
 
 const michiganQuestions: {
@@ -15,6 +22,7 @@ export const michiganHandOutcomeResponse = pgTable(
         patientId: integer("patientId")
             .references(() => patient.id)
             .notNull(),
+        done: boolean("done"),
         ...michiganQuestions,
         handedness: integer("handedness"),
         affectedSide: integer("affectedSide"),
@@ -36,6 +44,7 @@ export const sf36Response = pgTable("sf36Response", {
     patientId: integer("patientId")
         .references(() => patient.id)
         .notNull(),
+    done: boolean("done"),
     ...sf36Questions,
 })
 
@@ -43,7 +52,7 @@ const sf12Questions: {
     [qNum: string]: any
 } = {}
 for (let i = 1; i <= 12; i++) {
-    sf36Questions[`q${i}`] = integer(`q${i}`)
+    sf12Questions[`q${i}`] = integer(`q${i}`)
 }
 export const sf12Response = pgTable("sf12Response", {
     id: serial("id").primaryKey(),
@@ -51,13 +60,14 @@ export const sf12Response = pgTable("sf12Response", {
     patientId: integer("patientId")
         .references(() => patient.id)
         .notNull(),
+    done: boolean("done"),
     ...sf12Questions,
 })
 
 const dashQuestions: {
     [qNum: string]: any
 } = {}
-for (let i = 1; i <= 30; i++) {
+for (let i = 1; i <= 38; i++) {
     dashQuestions[`q${i}`] = integer(`q${i}`)
 }
 export const dashResponse = pgTable("dashResponse", {
@@ -66,13 +76,18 @@ export const dashResponse = pgTable("dashResponse", {
     patientId: integer("patientId")
         .references(() => patient.id)
         .notNull(),
+    done: boolean("done"),
     ...dashQuestions,
+    hasJob: integer("hasJob"),
+    job: text("job"),
+    hasSportOrInstrument: integer("hasSportOrInstrument"),
+    sportOrInstrument: text("sportOrInstrument"),
 })
 
 const qDashQuestions: {
     [qNum: string]: any
 } = {}
-for (let i = 1; i <= 11; i++) {
+for (let i = 1; i <= 19; i++) {
     qDashQuestions[`q${i}`] = integer(`q${i}`)
 }
 export const qDashResponse = pgTable("qDashResponse", {
@@ -81,7 +96,12 @@ export const qDashResponse = pgTable("qDashResponse", {
     patientId: integer("patientId")
         .references(() => patient.id)
         .notNull(),
-    ...sf12Questions,
+    done: boolean("done"),
+    ...qDashQuestions,
+    hasJob: integer("hasJob"),
+    job: text("job"),
+    hasSportOrInstrument: integer("hasSportOrInstrument"),
+    sportOrInstrument: text("sportOrInstrument"),
 })
 
 const bctQuestions: {
@@ -96,6 +116,7 @@ export const bctResponse = pgTable("bctResponse", {
     patientId: integer("patientId")
         .references(() => patient.id)
         .notNull(),
+    done: boolean("done"),
     ...bctQuestions,
 })
 
@@ -111,6 +132,7 @@ export const bsrsResponse = pgTable("bsrsResponse", {
     patientId: integer("patientId")
         .references(() => patient.id)
         .notNull(),
+    done: boolean("done"),
     ...bsrsQuestions,
 })
 
@@ -126,5 +148,6 @@ export const whoqolBrefResponse = pgTable("whoqolBrefResponse", {
     patientId: integer("patientId")
         .references(() => patient.id)
         .notNull(),
+    done: boolean("done"),
     ...whoqolBrefQuestions,
 })

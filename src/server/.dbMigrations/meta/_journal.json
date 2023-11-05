@@ -43,6 +43,13 @@
       "when": 1699016870560,
       "tag": "0005_purple_cardiac",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1699182879580,
+      "tag": "0006_flippant_earthquake",
+      "breakpoints": true
     }
   ]
 }

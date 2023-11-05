@@ -10,6 +10,7 @@ import {
     qDashResponse,
     sf12Response,
     sf36Response,
+    whoqolBrefResponse,
 } from "./schema"
 import { eq, and } from "drizzle-orm"
 import type { PgTableWithColumns } from "drizzle-orm/pg-core"
@@ -20,7 +21,7 @@ const QuestionnaireDBMap: { [questionnaire: string]: PgTableWithColumns<any> } =
         SF36: sf36Response,
         SF12: sf12Response,
         BCT: bctResponse,
-        WHOQOLbref: bctResponse,
+        WHOQOLbref: whoqolBrefResponse,
         BSRS: bsrsResponse,
         DASH: dashResponse,
         qDASH: qDashResponse,
@@ -57,6 +58,9 @@ export const questionnaireRouter = createTRPCRouter({
                 .where(
                     and(eq(table.patientId, patientId), eq(table.date, date)),
                 )
+            if (!result || result.length === 0) {
+                return null
+            }
             return result[0]
         }),
     addResponse: publicProcedure
@@ -86,17 +90,17 @@ export const questionnaireRouter = createTRPCRouter({
                 patientId: z.number(),
                 questionnaire: z.string(),
                 date: z.date(),
-                qNum: z.string(),
-                value: z.number().or(z.string()),
+                colName: z.string(),
+                value: z.number().or(z.string()).or(z.boolean()),
             }),
         )
         .mutation(async (req) => {
-            const { patientId, questionnaire, qNum, value, date } = req.input
+            const { patientId, questionnaire, colName, value, date } = req.input
             const table = QuestionnaireDBMap[questionnaire]
             try {
                 await db
                     .update(table)
-                    .set({ [qNum]: value })
+                    .set({ [colName]: value })
                     .where(
                         and(
                             eq(table.patientId, patientId),

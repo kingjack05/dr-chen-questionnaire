@@ -20,7 +20,7 @@ export const MHO = ({ patientId }: MHOPropType) => {
     const handleChange: HandleRadioGroupChange = async (e, qNum) => {
         await saveMHOResponse
             .mutateAsync({
-                qNum: `q${qNum}`,
+                colName: `q${qNum}`,
                 value: Number(e.target.value),
                 patientId,
                 questionnaire: "MHO",
@@ -34,7 +34,7 @@ export const MHO = ({ patientId }: MHOPropType) => {
     const handleQRadioChange: HandleRadioGroupChange = async (e, colName) => {
         await saveMHOResponse
             .mutateAsync({
-                qNum: colName,
+                colName,
                 value: Number(e.target.value),
                 patientId,
                 questionnaire: "MHO",
@@ -414,7 +414,7 @@ export const MHO = ({ patientId }: MHOPropType) => {
                             onChange={async (e) => {
                                 await saveMHOResponse
                                     .mutateAsync({
-                                        qNum: "previousJob",
+                                        colName: "previousJob",
                                         value: e.target.value,
                                         patientId,
                                         questionnaire: "MHO",
@@ -436,7 +436,7 @@ export const MHO = ({ patientId }: MHOPropType) => {
                             onChange={async (e) => {
                                 await saveMHOResponse
                                     .mutateAsync({
-                                        qNum: "currentJob",
+                                        colName: "currentJob",
                                         value: e.target.value,
                                         patientId,
                                         questionnaire: "MHO",
