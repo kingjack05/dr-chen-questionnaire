@@ -10,6 +10,7 @@ import { trpc } from "../trpc"
 import { QueryContextProvider } from "../Providers/QueryContext"
 import { AddPatientForm } from "../forms/AddPatientForm"
 import { questionnaireEnum, type FileData } from "../../server/patients/schema"
+import { scoreCalculator } from "./scoreCalculator"
 
 const PatientPageWithoutProvider = () => {
     const queryParameters = new URLSearchParams(window.location.search)
@@ -39,6 +40,20 @@ const PatientPageWithoutProvider = () => {
     }, {} as FilesDateMap)
 
     const editPatient = trpc.patient.editPatient.useMutation()
+
+    const patientQuestionnaireData = Array.from(questionnaireEnum).reduce(
+        (acc, questionnaire) => {
+            acc.set(
+                questionnaire,
+                trpc.questionnaire.responseByPatient.useQuery({
+                    questionnaire,
+                    patientId: Number(patientID),
+                }).data,
+            )
+            return acc
+        },
+        new Map(),
+    )
 
     const [basicInfoFormDisabled, setBasicInfoFormDisabled] = useState(true)
 
@@ -163,56 +178,78 @@ const PatientPageWithoutProvider = () => {
                         />
                     </div>
                     <div>
-                        <div className="mb-2 mt-1 text-gray-600">
-                            Michigan Hand Outcome
-                        </div>
-
-                        <QuestionnaireScoreAccordion
-                            title={
-                                <>
-                                    <div className="ml-1 mr-2 text-sm">
-                                        術後六個月
+                        {[...patientQuestionnaireData.entries()].map(
+                            ([questionnaireName, questionnaireDatas]) => {
+                                if (questionnaireDatas.length === 0) {
+                                    return
+                                }
+                                return (
+                                    <div key={questionnaireName}>
+                                        <div className="mb-2 mt-1 text-gray-600">
+                                            {questionnaireName}
+                                        </div>
+                                        {questionnaireDatas.map((data: any) => {
+                                            if (!data.done) {
+                                                return (
+                                                    <div key={data.id}>
+                                                        未完成
+                                                    </div>
+                                                )
+                                            }
+                                            const date = data.date
+                                                .toISOString()
+                                                .substring(0, 10)
+                                            const { totalScore, dimensions } =
+                                                scoreCalculator(
+                                                    data,
+                                                    questionnaireName,
+                                                )
+                                            return (
+                                                <div key={data.id}>
+                                                    <QuestionnaireScoreAccordion
+                                                        title={
+                                                            <div className="ml-1 mr-2 text-sm">
+                                                                {date}
+                                                            </div>
+                                                        }
+                                                        totalScore={String(
+                                                            Math.round(
+                                                                totalScore,
+                                                            ),
+                                                        )}
+                                                    >
+                                                        {dimensions.map(
+                                                            ({
+                                                                dimensionName,
+                                                                score,
+                                                            }) => (
+                                                                <div
+                                                                    className="flex"
+                                                                    key={
+                                                                        dimensionName
+                                                                    }
+                                                                >
+                                                                    <div className="flex-grow">
+                                                                        {
+                                                                            dimensionName
+                                                                        }
+                                                                    </div>
+                                                                    <div className=" flex-grow-0">
+                                                                        {Math.round(
+                                                                            score,
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            ),
+                                                        )}
+                                                    </QuestionnaireScoreAccordion>
+                                                </div>
+                                            )
+                                        })}
                                     </div>
-                                    <div className="text-xs text-gray-400">
-                                        108.10.14
-                                    </div>
-                                </>
-                            }
-                            totalScore="80"
-                        >
-                            <>
-                                <div className="flex">
-                                    <div className="flex-grow">
-                                        Overall Hand Function
-                                    </div>
-                                    <div className=" flex-grow-0">75</div>
-                                </div>
-                                <div className="flex">
-                                    <div className="flex-grow">
-                                        Activities of daily living
-                                    </div>
-                                    <div className=" flex-grow-0">75</div>
-                                </div>
-                                <div className="flex">
-                                    <div className="flex-grow">Work</div>
-                                    <div className=" flex-grow-0">85</div>
-                                </div>
-                                <div className="flex">
-                                    <div className="flex-grow">Pain</div>
-                                    <div className=" flex-grow-0">60</div>
-                                </div>
-                                <div className="flex">
-                                    <div className="flex-grow">Aesthetics</div>
-                                    <div className=" flex-grow-0">75</div>
-                                </div>
-                                <div className="flex">
-                                    <div className="flex-grow">
-                                        Satisfaction
-                                    </div>
-                                    <div className=" flex-grow-0">85</div>
-                                </div>
-                            </>
-                        </QuestionnaireScoreAccordion>
+                                )
+                            },
+                        )}
                     </div>
                 </div>
             </div>
@@ -298,6 +335,10 @@ const QuestionnaireScoreAccordion = ({
     title = <></>,
     children = <></>,
     totalScore = "",
+}: {
+    title: React.ReactNode
+    children: React.ReactNode
+    totalScore: string
 }) => {
     return (
         <details className="group" open>
