@@ -29,9 +29,7 @@ type CreateAstroContextOptions = Partial<{
 }>
 
 /** Replace this with an object if you want to pass things to `createContextInner`. */
-type CreateContextOptions = {
-    userId?: string
-}
+type CreateContextOptions = {}
 
 import { s3 } from "./s3Instance"
 /**
@@ -48,6 +46,7 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
     return { ...opts, s3 }
 }
 
+import jwt from "jsonwebtoken"
 /**
  * This is the actual context you will use in your router. It will be used to process every request
  * that goes through your tRPC endpoint.
@@ -55,11 +54,31 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
  * @see https://trpc.io/docs/context
  * @see https://trpc.io/docs/server/context#inner-and-outer-context
  */
-export const createTRPCContext = (opts: CreateAstroContextOptions) => {
+export const createTRPCContext = async (opts: CreateAstroContextOptions) => {
     const contextInner = createInnerTRPCContext({})
+
+    const { req } = opts
+
+    async function getUserFromHeader() {
+        const authorization = req?.headers.get("authorization")
+        if (authorization) {
+            const user = jwt.verify(
+                authorization,
+                import.meta.env.AWS_SECRET_ACCESS_KEY ??
+                    process.env.AWS_SECRET_ACCESS_KEY,
+            )
+
+            return user
+        }
+        return null
+    }
+
+    const user = await getUserFromHeader()
+
     return {
         ...contextInner,
         ...opts,
+        user,
     }
 }
 type Context = inferAsyncReturnType<typeof createTRPCContext>
@@ -71,7 +90,7 @@ type Context = inferAsyncReturnType<typeof createTRPCContext>
  * ZodErrors so that you get typesafety on the frontend if your procedure fails due to validation
  * errors on the backend.
  */
-import { initTRPC } from "@trpc/server"
+import { initTRPC, TRPCError } from "@trpc/server"
 import superjson from "superjson"
 import { z, ZodError } from "zod"
 
@@ -137,7 +156,8 @@ export const adminProcedure = publicProcedure.use(async ({ ctx, next }) => {
     if (!ctx.req) {
         throw new Error("Missing req")
     }
-    if (ctx.req.headers.authorization) {
+    if (!ctx.user) {
+        throw new TRPCError({ code: "UNAUTHORIZED" })
     }
 
     return next({

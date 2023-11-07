@@ -1,6 +1,10 @@
 import { z } from "zod"
 import { db } from "../db"
-import { createTRPCRouter, publicProcedure } from "../trpcInstance"
+import {
+    adminProcedure,
+    createTRPCRouter,
+    publicProcedure,
+} from "../trpcInstance"
 import { FileDataZodObj, insertPatientSchema, patient } from "./schema"
 import { eq } from "drizzle-orm"
 import { ListObjectsV2Command, PutObjectCommand } from "@aws-sdk/client-s3"
@@ -57,7 +61,7 @@ export const patientRouter = createTRPCRouter({
                 console.log(error)
             }
         }),
-    getFiles: publicProcedure.query(async ({ ctx }) => {
+    getFiles: adminProcedure.query(async ({ ctx }) => {
         const { s3 } = ctx
         const command = new ListObjectsV2Command({ Bucket: "reason" })
         let listObjectsOutput

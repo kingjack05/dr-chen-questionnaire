@@ -4,12 +4,37 @@ import { useState } from "react"
 import { trpc } from "../trpc"
 import superjson from "superjson"
 
+type queryError = {
+    message: string
+}
 export const QueryContextProvider = ({
     children,
 }: {
     children: React.ReactNode
 }) => {
-    const [queryClient] = useState(() => new QueryClient())
+    const [queryClient] = useState(
+        () =>
+            new QueryClient({
+                defaultOptions: {
+                    queries: {
+                        onError: (error) => {
+                            const { message } = error as queryError
+                            if (message === "UNAUTHORIZED") {
+                                window.location.href = "/adminLogin"
+                            }
+                        },
+                    },
+                    mutations: {
+                        onError(error, variables, context) {
+                            const { message } = error as queryError
+                            if (message === "UNAUTHORIZED") {
+                                window.location.href = "/adminLogin"
+                            }
+                        },
+                    },
+                },
+            }),
+    )
     const [trpcClient] = useState(() =>
         trpc.createClient({
             transformer: superjson,
@@ -17,9 +42,13 @@ export const QueryContextProvider = ({
                 httpBatchLink({
                     url: "/api/trpc",
                     async headers() {
-                        return {
-                            authorization: "Hi",
+                        const token = localStorage.getItem("token")
+                        if (token) {
+                            return {
+                                authorization: token,
+                            }
                         }
+                        return {}
                     },
                 }),
             ],

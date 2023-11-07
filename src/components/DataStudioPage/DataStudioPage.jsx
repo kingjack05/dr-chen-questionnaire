@@ -7,10 +7,13 @@ import { useMemo } from "react"
 import { $AINPatients, $raynaudPatients } from "../PatientPage/store"
 import { StatisticalAnalysisPanel } from "./custom tool panels/StatisticalAnalysisPanel"
 import { ActionPanel } from "./custom tool panels/ActionPanel"
+import { trpc } from "../trpc"
+import { QueryContextProvider } from "../Providers/QueryContext"
 
-export const DataStudioPage = () => {
+const DataStudioPageWithoutProvider = () => {
     const queryParameters = new URLSearchParams(window.location.search)
     const table = queryParameters.get("table") ?? "Raynaud's Phenomenon"
+    document.title = table + " 表格"
     const patientID = queryParameters.get("id") ?? "10836635"
     const { rowData, columnDefs, rowIDGetter } = tableConfigsFactory(table)
 
@@ -66,6 +69,14 @@ export const DataStudioPage = () => {
     )
 }
 
+export const DataStudioPage = () => {
+    return (
+        <QueryContextProvider>
+            <DataStudioPageWithoutProvider />
+        </QueryContextProvider>
+    )
+}
+
 /**
  * @param {string} table - Name of the table
  * @returns {{rowData, columnDefs, rowIDGetter}}
@@ -96,10 +107,18 @@ const tableConfigsFactory = (table) => {
             {
                 headerName: "基本資料",
                 children: [
-                    { field: "id" },
-                    { field: "name", columnGroupShow: "open" },
-                    { field: "gender", columnGroupShow: "open" },
-                    { field: "birthday", columnGroupShow: "open" },
+                    { field: "id", editable: false },
+                    { field: "name", columnGroupShow: "open", editable: false },
+                    {
+                        field: "gender",
+                        columnGroupShow: "open",
+                        editable: false,
+                    },
+                    {
+                        field: "birthday",
+                        columnGroupShow: "open",
+                        editable: false,
+                    },
                 ],
             },
             {
