@@ -1,8 +1,16 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { httpBatchLink } from "@trpc/client"
+import { TRPCClientError, httpBatchLink } from "@trpc/client"
 import { useState } from "react"
 import { trpc } from "../trpc"
 import superjson from "superjson"
+import type { AppRouter } from "../../server/routerIndex"
+
+const HTTP_STATUS_TO_NOT_RETRY = ["UNAUTHORIZED"]
+function isTRPCClientError(
+    cause: unknown,
+): cause is TRPCClientError<AppRouter> {
+    return cause instanceof TRPCClientError
+}
 
 type queryError = {
     message: string
@@ -23,9 +31,19 @@ export const QueryContextProvider = ({
                                 window.location.href = "/adminLogin"
                             }
                         },
+                        // https://github.com/TanStack/query/discussions/372#discussioncomment-6023276
+                        retry: (failureCount, error) => {
+                            if (
+                                isTRPCClientError(error) &&
+                                HTTP_STATUS_TO_NOT_RETRY.includes(error.message)
+                            ) {
+                                return false
+                            }
+                            return true
+                        },
                     },
                     mutations: {
-                        onError(error, variables, context) {
+                        onError: (error) => {
                             const { message } = error as queryError
                             if (message === "UNAUTHORIZED") {
                                 window.location.href = "/adminLogin"

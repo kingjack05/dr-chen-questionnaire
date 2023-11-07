@@ -27,7 +27,7 @@ export const patientRouter = createTRPCRouter({
             })
             return result
         }),
-    getPatientsIdAndName: publicProcedure.query(async () => {
+    getPatientsIdAndName: adminProcedure.query(async () => {
         const patients = await db.query.patient.findMany({
             columns: {
                 id: true,
@@ -42,13 +42,13 @@ export const patientRouter = createTRPCRouter({
         })
         return patientLastEdited
     }),
-    addPatient: publicProcedure
+    addPatient: adminProcedure
         .input(insertPatientSchema)
         .mutation(async (opts) => {
             const data = opts.input
             await db.insert(patient).values(data)
         }),
-    editPatient: publicProcedure
+    editPatient: adminProcedure
         .input(insertPatientSchema)
         .mutation(async (opts) => {
             const data = opts.input
@@ -73,7 +73,7 @@ export const patientRouter = createTRPCRouter({
 
         return listObjectsOutput?.Contents ?? []
     }),
-    getStandardUploadPresignedUrl: publicProcedure
+    getStandardUploadPresignedUrl: adminProcedure
         .input(z.object({ key: z.string() }))
         .mutation(async ({ ctx, input }) => {
             const { key } = input
@@ -86,7 +86,7 @@ export const patientRouter = createTRPCRouter({
 
             return await getSignedUrl(s3, putObjectCommand)
         }),
-    addFileData: publicProcedure
+    addFileData: adminProcedure
         .input(FileDataZodObj.and(z.object({ id: z.number() })))
         .mutation(async ({ input }) => {
             const { url, date, type, extension, id } = input
