@@ -20,6 +20,7 @@ export const AddPatientForm = ({ onSubmit }: PropTypes) => {
         register,
         handleSubmit,
         watch,
+        setValue,
         formState: { errors },
     } = useForm<TForm>({
         // zodResolver zod version issues: https://github.com/colinhacks/zod/issues/2663, https://github.com/orgs/react-hook-form/discussions/10861
@@ -118,6 +119,20 @@ export const AddPatientForm = ({ onSubmit }: PropTypes) => {
                                     value={diagnosis}
                                     {...register("diagnoses")}
                                     className=" mr-1"
+                                    onClick={() => {
+                                        if (diagnosis === "AIN Compression") {
+                                            setValue(
+                                                "followingQuestionnaires",
+                                                ["BSRS", "SF36", "DASH"],
+                                            )
+                                        }
+                                        if (diagnosis === "Raynaud") {
+                                            setValue(
+                                                "followingQuestionnaires",
+                                                ["MHO", "SF36"],
+                                            )
+                                        }
+                                    }}
                                 />
                                 {diagnosis}
                             </label>

@@ -25,6 +25,11 @@ const PatientPageWithoutProvider = () => {
     const refetchPatientData = trpc.patient.patientById.useQuery(
         Number(patientID),
     ).refetch
+    useEffect(() => {
+        if (patientData) {
+            document.title = patientData.name
+        }
+    }, [patientData?.name])
 
     const patientFiles = patientData?.files
         ? (patientData.files as FileData[])
@@ -357,14 +362,6 @@ const QuestionnaireScoreAccordion = ({
                         </svg>
                     </span>
                     {title}
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 32 32"
-                        className="ml-2 h-5 w-5 fill-current text-gray-300 hover:text-gray-800"
-                    >
-                        <path d="M10 18h8v2h-8zM10 13h12v2H10zM10 23h5v2h-5z" />
-                        <path d="M25 5h-3V4a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v1H7a2 2 0 0 0-2 2v21a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2ZM12 4h8v4h-8Zm13 24H7V7h3v3h12V7h3Z" />
-                    </svg>
                 </div>
                 <div className="group-open:text-gray-600">{totalScore}</div>
             </summary>
