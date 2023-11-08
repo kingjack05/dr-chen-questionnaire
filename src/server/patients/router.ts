@@ -7,7 +7,11 @@ import {
 } from "../trpcInstance"
 import { FileDataZodObj, insertPatientSchema, patient } from "./schema"
 import { eq } from "drizzle-orm"
-import { ListObjectsV2Command, PutObjectCommand } from "@aws-sdk/client-s3"
+import {
+    ListObjectsV2Command,
+    PutObjectCommand,
+    DeleteObjectCommand,
+} from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 
 export const patientRouter = createTRPCRouter({
@@ -86,6 +90,19 @@ export const patientRouter = createTRPCRouter({
 
             return await getSignedUrl(s3, putObjectCommand)
         }),
+    deleteFile: adminProcedure
+        .input(z.object({ key: z.string() }))
+        .mutation(async ({ ctx, input }) => {
+            const { key } = input
+            const { s3 } = ctx
+
+            const deleteObjectCommand = new DeleteObjectCommand({
+                Bucket: "reason",
+                Key: key,
+            })
+
+            return await s3.send(deleteObjectCommand)
+        }),
     addFileData: adminProcedure
         .input(FileDataZodObj.and(z.object({ id: z.number() })))
         .mutation(async ({ input }) => {
@@ -104,6 +121,27 @@ export const patientRouter = createTRPCRouter({
                             ...originalFiles,
                             { url, date, type, extension },
                         ],
+                    })
+                    .where(eq(patient.id, id))
+            } catch (error) {
+                console.log(error)
+            }
+        }),
+    deleteFileData: adminProcedure
+        .input(z.object({ url: z.string(), id: z.number() }))
+        .mutation(async ({ input }) => {
+            const { url, id } = input
+            try {
+                const originalData = await db.query.patient.findFirst({
+                    where: (patient, { eq }) => eq(patient.id, id),
+                })
+                const originalFiles = originalData?.files // @ts-ignore
+                    ? originalData.files.filter((file) => file.url !== url)
+                    : []
+                await db
+                    .update(patient)
+                    .set({
+                        files: originalFiles,
                     })
                     .where(eq(patient.id, id))
             } catch (error) {

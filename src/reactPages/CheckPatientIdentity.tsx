@@ -6,7 +6,7 @@ import { QueryContextProvider } from "../components/Providers/QueryContext"
 
 export const CheckPatientIdentityPageWithoutProvider = () => {
     const [name, setName] = useState("")
-    const [bday, setBday] = useState("1990-01-01")
+    const [bday, setBday] = useState("1990-06-01")
 
     const getPatient = trpc.patient.patientByNameAndBDay.useMutation()
 

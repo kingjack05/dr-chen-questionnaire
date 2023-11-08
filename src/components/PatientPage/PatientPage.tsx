@@ -148,15 +148,11 @@ const PatientPageWithoutProvider = () => {
                             <div className="mb-2 text-gray-600">{obj[0]}</div>
                             {obj[1].map(({ url, type }) => (
                                 <div key={url}>
-                                    {type === "image" && (
-                                        <img src={url} className="w-18 h-24" />
-                                    )}
-                                    {type === "video" && (
-                                        <video
-                                            src={url}
-                                            className="w-18 h-24"
-                                        />
-                                    )}
+                                    <FileModal
+                                        src={url}
+                                        type={type}
+                                        id={patientID}
+                                    />
                                 </div>
                             ))}
                         </div>
@@ -194,16 +190,25 @@ const PatientPageWithoutProvider = () => {
                                             {questionnaireName}
                                         </div>
                                         {questionnaireDatas.map((data: any) => {
-                                            if (!data.done) {
-                                                return (
-                                                    <div key={data.id}>
-                                                        未完成
-                                                    </div>
-                                                )
-                                            }
+                                            const today = new Date()
+                                                .toISOString()
+                                                .substring(0, 10)
                                             const date = data.date
                                                 .toISOString()
                                                 .substring(0, 10)
+                                            if (!data.done && date === today) {
+                                                return (
+                                                    <div
+                                                        key={data.id}
+                                                        className="text-red-400"
+                                                    >
+                                                        本日有未完成問卷
+                                                    </div>
+                                                )
+                                            }
+                                            if (!data.done) {
+                                                return
+                                            }
                                             const { totalScore, dimensions } =
                                                 scoreCalculator(
                                                     data,
@@ -549,6 +554,97 @@ const UploadPopover = ({ id }: { id: string }) => {
                     )
                 }}
             </Popover>
+        </>
+    )
+}
+
+const FileModal = ({
+    type,
+    src,
+    id,
+}: {
+    type: string
+    src: string
+    id: string
+}) => {
+    let [isOpen, setIsOpen] = useState(false)
+
+    const deleteFile = trpc.patient.deleteFile.useMutation()
+    const deletePatientFileData = trpc.patient.deleteFileData.useMutation()
+    const refetchPatientData = trpc.patient.patientById.useQuery(
+        Number(id),
+    ).refetch
+
+    const onDelete = async () => {
+        const key = src.replace(
+            "https://reason.s3.us-west-004.backblazeb2.com/",
+            "",
+        )
+        try {
+            await deleteFile.mutateAsync({ key })
+            await deletePatientFileData.mutateAsync({
+                id: Number(id),
+                url: src,
+            })
+            toast.success("刪除成功")
+            await refetchPatientData()
+        } catch (error) {
+            toast.error("刪除失敗")
+            console.log(error)
+        }
+    }
+
+    return (
+        <>
+            <div
+                onClick={() => {
+                    setIsOpen(true)
+                }}
+            >
+                {type === "image" && <img src={src} className="w-18 h-24" />}
+                {type === "video" && <video src={src} className="w-18 h-24" />}
+            </div>
+            <Dialog
+                className=" relative"
+                open={isOpen}
+                onClose={() => setIsOpen(false)}
+            >
+                {({ open }) => {
+                    return (
+                        <>
+                            <div
+                                className="fixed inset-0 bg-black/30"
+                                aria-hidden="true"
+                            />
+                            <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
+                                <Dialog.Panel className="container mx-auto  rounded bg-white py-4 pl-4 pr-8">
+                                    <div className="flex flex-col items-center justify-center">
+                                        {type === "image" && (
+                                            <img
+                                                src={src}
+                                                className="max-h-[85vh]"
+                                            />
+                                        )}
+                                        {type === "video" && (
+                                            <video
+                                                src={src}
+                                                controls
+                                                className="max-h-[90vh]"
+                                            />
+                                        )}
+                                        <button
+                                            className="btn mt-2 bg-red-400"
+                                            onClick={onDelete}
+                                        >
+                                            刪除檔案
+                                        </button>
+                                    </div>
+                                </Dialog.Panel>
+                            </div>
+                        </>
+                    )
+                }}
+            </Dialog>
         </>
     )
 }

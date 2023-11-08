@@ -26,6 +26,7 @@ export const adminRouter = createTRPCRouter({
                 user,
                 import.meta.env.AWS_SECRET_ACCESS_KEY ??
                     process.env.AWS_SECRET_ACCESS_KEY,
+                { expiresIn: "10h" },
             )
 
             return { status: "Success", token }
