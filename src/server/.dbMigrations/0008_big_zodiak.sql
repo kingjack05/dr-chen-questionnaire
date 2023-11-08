@@ -1,0 +1,1 @@
+ALTER TABLE "raynaudData" RENAME COLUMN "timeFromAutoimmneToOp" TO "timeFromAutoimmuneToOp";

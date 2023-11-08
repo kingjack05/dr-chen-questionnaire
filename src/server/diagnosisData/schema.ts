@@ -6,28 +6,22 @@ export const raynaudData = pgTable("raynaudData", {
     patientId: integer("patientId")
         .references(() => patient.id)
         .notNull(),
-    postOPYear: integer("postOPYear"),
+
     affectedSide: integer("affectedSide"),
     comorbidities: integer("comorbidities"),
     psychologicalDisorder: integer("psychologicalDisorder"),
     smoking: integer("smoking"),
     autoimmuneDzSince: text("autoimmuneDzSince"),
     raynaudSince: text("raynaudSince"),
-    surgeryDate: text("surgeryDate"),
-    yearsFromAutoimmneToOp: integer("timeFromAutoimmneToOp"),
+    yearsFromAutoimmuneToOp: integer("timeFromAutoimmuneToOp"),
     yearsFromRaynaudToOp: integer("yearsFromRaynaudToOp"),
     pastIntervention: integer("pastIntervention"),
     oralVasodilatorTreatment: integer("oralVasodilatorTreatment"),
     seasonal: integer("seasonal"),
-    discoloration: integer("discoloration"),
-    numbness: integer("numbness"),
-    pain: integer("pain"),
-    digitalUlcerationPresence: integer("digitalUlcerationPresence"),
-    digitalUlcerationNumbers: integer("digitalUlcerationNumbers"),
-    attackFrequency: integer("attackFrequency"),
+
+    surgeryDate: text("surgeryDate"),
     nailfoldCapillaryMicroscopy: integer("nailfoldCapillaryMicroscopy"),
     nerveOfHenleDistanceToPisiform: numeric("nerveOfHenleDistanceToPisiform"),
-
     icgIngressBGPreOp: numeric("icgIngressBGPreOp"),
     icgIngressBGPostOp: numeric("icgIngressBGPostOp"),
     icgIngressRateBGPreOp: numeric("icgIngressRateBGPreOp"),
@@ -66,7 +60,6 @@ export const raynaudData = pgTable("raynaudData", {
     icgEgressRateImprovementBrightestArea: numeric(
         "icgEgressRateImprovementBrightestArea",
     ),
-
     finger2ICGIngressPreOp: numeric("finger2ICGIngressPreOp"),
     finger2ICGIngressPostOp: numeric("finger2ICGIngressPostOp"),
     finger2ICGIngressRatePreOp: numeric("finger2ICGIngressRatePreOp"),
@@ -81,7 +74,6 @@ export const raynaudData = pgTable("raynaudData", {
     finger2ICGEgressRatePostOp: numeric("finger2ICGEgressRatePostOp"),
     finger2ICGEgressImprovement: numeric("finger2ICGEgressImprovement"),
     finger2ICGEgressRateImprovement: numeric("finger2ICGEgressRateImprovement"),
-
     finger3ICGIngressPreOp: numeric("finger3ICGIngressPreOp"),
     finger3ICGIngressPostOp: numeric("finger3ICGIngressPostOp"),
     finger3ICGIngressRatePreOp: numeric("finger3ICGIngressRatePreOp"),
@@ -96,7 +88,6 @@ export const raynaudData = pgTable("raynaudData", {
     finger3ICGEgressRatePostOp: numeric("finger3ICGEgressRatePostOp"),
     finger3ICGEgressImprovement: numeric("finger3ICGEgressImprovement"),
     finger3ICGEgressRateImprovement: numeric("finger3ICGEgressRateImprovement"),
-
     finger4ICGIngressPreOp: numeric("finger4ICGIngressPreOp"),
     finger4ICGIngressPostOp: numeric("finger4ICGIngressPostOp"),
     finger4ICGIngressRatePreOp: numeric("finger4ICGIngressRatePreOp"),
@@ -112,9 +103,15 @@ export const raynaudData = pgTable("raynaudData", {
     finger4ICGEgressImprovement: numeric("finger4ICGEgressImprovement"),
     finger4ICGEgressRateImprovement: numeric("finger4ICGEgressRateImprovement"),
 
+    postOPYear: integer("postOPYear"),
+    discoloration: integer("discoloration"),
+    numbness: integer("numbness"),
+    pain: integer("pain"),
+    digitalUlcerationPresence: integer("digitalUlcerationPresence"),
+    digitalUlcerationNumbers: integer("digitalUlcerationNumbers"),
+    attackFrequency: integer("attackFrequency"),
     digitalSkinTemperature: numeric("digitalSkinTemperature"),
     digitalSkinBloodFlow: numeric("digitalSkinBloodFlow"),
-
     MHOOverallR: numeric("MHOOverallR"),
     MHOOverallL: numeric("MHOOverallL"),
     MHOActivitiesROH: numeric("MHOActivitiesROH"),
@@ -128,7 +125,6 @@ export const raynaudData = pgTable("raynaudData", {
     MHOAestheticsL: numeric("MHOAestheticsL"),
     MHOSatisfactionR: numeric("MHOSatisfactionR"),
     MHOSatisfactionL: numeric("MHOSatisfactionL"),
-
     SF36PhyFunc: numeric("SF36PhyFunc"),
     SF36RolePhy: numeric("SF36RolePhy"),
     SF36BodyPain: numeric("SF36BodyPain"),
