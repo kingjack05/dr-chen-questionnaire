@@ -17,6 +17,10 @@ const DataStudioPageWithoutProvider = () => {
     const patientID = queryParameters.get("id") ?? "10836635"
     const { rowData, columnDefs, rowIDGetter, onGridReady } =
         tableConfigsFactory(table)
+    const saveData = trpc.diagnosisData.setData.useMutation().mutateAsync
+    const refetch = trpc.diagnosisData.getAllData.useQuery({
+        diagnosis: table,
+    }).refetch
 
     const defaultColDef = useMemo(
         () => ({
@@ -41,6 +45,12 @@ const DataStudioPageWithoutProvider = () => {
                 rowSelection={"single"}
                 getRowId={rowIDGetter}
                 onGridReady={onGridReady}
+                onCellValueChanged={async ({ column, value, data }) => {
+                    const rowId = data.id
+                    const colName = column.getColId()
+                    await saveData({ rowId, diagnosis: table, colName, value })
+                    await refetch()
+                }}
                 sideBar={{
                     toolPanels: [
                         {

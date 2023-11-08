@@ -7,7 +7,9 @@ export const tableConfigsFactory = (table: "Raynaud" | "AIN Compression") => {
 }
 
 const RaynaudTableConfigs = () => {
-    const data = trpc.diagnosisData.getRaynaudData.useQuery().data
+    const data = trpc.diagnosisData.getAllData.useQuery({
+        diagnosis: "Raynaud",
+    }).data
 
     const rowData = data
         ? data.map((item) => {

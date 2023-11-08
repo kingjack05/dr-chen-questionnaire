@@ -12,14 +12,18 @@ const tableMap: { [diagnosis: string]: PgTableWithColumns<any> } = {
 }
 
 export const diagnosisDataRouter = createTRPCRouter({
-    getRaynaudData: adminProcedure.query(async () => {
-        const results = db
-            .select()
-            .from(raynaudData)
-            .innerJoin(patient, eq(raynaudData.patientId, patient.id))
+    getAllData: adminProcedure
+        .input(z.object({ diagnosis: z.string() }))
+        .query(async ({ input }) => {
+            const { diagnosis } = input
+            const table = tableMap[diagnosis]
+            const results = db
+                .select()
+                .from(table)
+                .innerJoin(patient, eq(table.patientId, patient.id))
 
-        return results
-    }),
+            return results
+        }),
     getData: adminProcedure
         .input(z.object({ patientId: z.number(), diagnosis: z.string() }))
         .query(async ({ input }) => {
@@ -44,6 +48,30 @@ export const diagnosisDataRouter = createTRPCRouter({
                         { patientId, postOPYear: 0 },
                         { patientId, postOPYear: 1 },
                     ])
+                    return result
+                } catch (error) {
+                    console.log(error)
+                }
+            }
+        }),
+    setData: adminProcedure
+        .input(
+            z.object({
+                rowId: z.number(),
+                diagnosis: z.string(),
+                colName: z.string(),
+                value: z.string().or(z.number()),
+            }),
+        )
+        .mutation(async ({ input }) => {
+            const { rowId, diagnosis, colName, value } = input
+
+            if (diagnosis === "Raynaud") {
+                try {
+                    const result = await db
+                        .update(raynaudData)
+                        .set({ [colName]: value })
+                        .where(eq(raynaudData.id, rowId))
                     return result
                 } catch (error) {
                     console.log(error)
