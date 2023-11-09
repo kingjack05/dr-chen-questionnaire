@@ -33,6 +33,10 @@ export const ActionPanel = ({ api, columnApi }) => {
     const [query, setQuery] = useState(defaultPatientID)
 
     const addData = trpc.diagnosisData.addData.useMutation().mutateAsync
+    const saveData = trpc.diagnosisData.setData.useMutation().mutateAsync
+    const refetch = trpc.diagnosisData.getAllData.useQuery({
+        diagnosis,
+    }).refetch
 
     const filteredPateints = query
         ? patientIDAndNames.filter((patient) => {
@@ -166,8 +170,23 @@ export const ActionPanel = ({ api, columnApi }) => {
                         selectedQuestionnaireData,
                         questionnaire,
                     )
-                    console.log(dimensions)
-                    console.log(selectedRow[0].id)
+                    const promises = dimensions.map((dimension) => {
+                        const { dimensionName, score } = dimension
+                        return saveData({
+                            rowId: selectedRow[0].id,
+                            diagnosis,
+                            colName: dimensionsToColnameMap[dimensionName],
+                            value: score,
+                        })
+                    })
+                    try {
+                        await Promise.all(promises)
+                        toast.success("載入成功")
+                        await refetch()
+                    } catch (error) {
+                        toast.error("載入失敗")
+                        console.log(error)
+                    }
                 }}
             >
                 載入資料
