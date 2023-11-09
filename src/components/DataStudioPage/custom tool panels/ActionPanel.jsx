@@ -6,19 +6,29 @@ import { trpc } from "../../trpc"
 import { scoreCalculator } from "../../PatientPage/scoreCalculator"
 
 const dimensionsToColnameMap = {
-    "手部整體功能 - 右手": "MHOOverallR",
-    "手部整體功能 - 左手": "MHOOverallL",
-    "日常活動 - 右手單手": "MHOActivitiesROH",
-    "日常活動 - 右手整體": "MHOActivitiesROverall",
-    "日常活動 - 左手單手": "MHOActivitiesLOH",
-    "日常活動 - 左手整體": "MHOActivitiesLOverall",
-    "日常活動 - 雙手": "MHOActivitiesTH",
-    工作: "MHOWork",
-    疼痛: "MHOPain",
-    "美觀 - 右手": "MHOAestheticsR",
-    "美觀 - 左手": "MHOAestheticsL",
-    "滿意度 - 右手": "MHOSatisfactionR",
-    "滿意度 - 左手": "MHOSatisfactionL",
+    Raynaud: {
+        "手部整體功能 - 右手": "MHOOverallR",
+        "手部整體功能 - 左手": "MHOOverallL",
+        "日常活動 - 右手單手": "MHOActivitiesROH",
+        "日常活動 - 右手整體": "MHOActivitiesROverall",
+        "日常活動 - 左手單手": "MHOActivitiesLOH",
+        "日常活動 - 左手整體": "MHOActivitiesLOverall",
+        "日常活動 - 雙手": "MHOActivitiesTH",
+        工作: "MHOWork",
+        疼痛: "MHOPain",
+        "美觀 - 右手": "MHOAestheticsR",
+        "美觀 - 左手": "MHOAestheticsL",
+        "滿意度 - 右手": "MHOSatisfactionR",
+        "滿意度 - 左手": "MHOSatisfactionL",
+        "Physical Function": "SF36PhyFunc",
+        "Role Physical": "SF36RolePhy",
+        "Body Pain": "SF36BodyPain",
+        "General Health": "SF36GenHealth",
+        Vitality: "SF36Vitality",
+        "Social Function": "SF36SocialFunc",
+        "Role Emotion": "SF36RoleEmotion",
+        "Mental Health": "SF36MentalHealth",
+    },
 }
 
 export const ActionPanel = ({ api, columnApi }) => {
@@ -34,9 +44,6 @@ export const ActionPanel = ({ api, columnApi }) => {
 
     const addData = trpc.diagnosisData.addData.useMutation().mutateAsync
     const saveData = trpc.diagnosisData.setData.useMutation().mutateAsync
-    const refetch = trpc.diagnosisData.getAllData.useQuery({
-        diagnosis,
-    }).refetch
 
     const filteredPateints = query
         ? patientIDAndNames.filter((patient) => {
@@ -47,7 +54,7 @@ export const ActionPanel = ({ api, columnApi }) => {
           })
         : []
 
-    const [questionnaire, setQuestionnaire] = useState("MHO")
+    const [questionnaire, setQuestionnaire] = useState("")
     const QuestionnaireData =
         trpc.questionnaire.responseByPatient
             .useQuery({
@@ -112,7 +119,9 @@ export const ActionPanel = ({ api, columnApi }) => {
                             patientId: Number(patientId),
                             diagnosis,
                         })
+                        toast.success("成功新增。請重新整理")
                     } catch (error) {
+                        toast.error("出了點問題...")
                         console.log(error)
                     }
                 }}
@@ -127,8 +136,20 @@ export const ActionPanel = ({ api, columnApi }) => {
                         setQuestionnaire(e.target.value)
                     }}
                 >
-                    <option value="MHO">MHO</option>
-                    <option value="SF36">SF36</option>
+                    <option value="">請選擇問卷</option>
+                    {diagnosis === "Raynaud" ? (
+                        <>
+                            <option value="MHO">MHO</option>
+                            <option value="SF36">SF36</option>
+                        </>
+                    ) : null}
+                    {diagnosis === "AIN Compression" ? (
+                        <>
+                            <option value="BSRS">BSRS</option>
+                            <option value="SF36">SF36</option>
+                            <option value="DASH">DASH</option>
+                        </>
+                    ) : null}
                 </select>
                 {QuestionnaireData.length === 0 ? <>沒有問卷資料</> : <></>}
                 {QuestionnaireData.length > 0 ? (
@@ -157,8 +178,8 @@ export const ActionPanel = ({ api, columnApi }) => {
                         toast.error("請選擇載入位置")
                         return
                     }
-                    if (!selectedDate) {
-                        toast.error("請選擇載入日期")
+                    if (!questionnaire || !selectedDate) {
+                        toast.error("請選擇載入問卷或日期")
                         return
                     }
                     const selectedQuestionnaireData = QuestionnaireData.find(
@@ -170,19 +191,43 @@ export const ActionPanel = ({ api, columnApi }) => {
                         selectedQuestionnaireData,
                         questionnaire,
                     )
-                    const promises = dimensions.map((dimension) => {
-                        const { dimensionName, score } = dimension
-                        return saveData({
-                            rowId: selectedRow[0].id,
-                            diagnosis,
-                            colName: dimensionsToColnameMap[dimensionName],
-                            value: score,
+                    let promises
+                    if (diagnosis === "Raynaud") {
+                        promises = dimensions.map((dimension) => {
+                            const { dimensionName, score } = dimension
+                            const colName =
+                                dimensionsToColnameMap[diagnosis][dimensionName]
+                            if (!colName) {
+                                return
+                            }
+                            return saveData({
+                                rowId: selectedRow[0].id,
+                                diagnosis,
+                                colName,
+                                value: score,
+                            })
                         })
-                    })
+                    }
+                    if (diagnosis === "AIN Compression") {
+                        const questionnaireToColnameMap = {
+                            BSRS: "bsrs",
+                            SF36: "sf36",
+                            DASH: "dash",
+                        }
+                        const colName = questionnaireToColnameMap[questionnaire]
+                        console.log(colName)
+                        promises = [
+                            saveData({
+                                rowId: selectedRow[0].id,
+                                diagnosis,
+                                colName,
+                                value: totalScore,
+                            }),
+                        ]
+                    }
                     try {
                         await Promise.all(promises)
                         toast.success("載入成功")
-                        await refetch()
                     } catch (error) {
                         toast.error("載入失敗")
                         console.log(error)

@@ -134,3 +134,33 @@ export const raynaudData = pgTable("raynaudData", {
     SF36RoleEmotion: numeric("SF36RoleEmotion"),
     SF36MentalHealth: numeric("SF36MentalHealth"),
 })
+
+export const AINData = pgTable("AINData", {
+    id: serial("id").primaryKey(),
+    patientId: integer("patientId")
+        .references(() => patient.id)
+        .notNull(),
+    postOPMonth: integer("postOPMonth"),
+    group: integer("group"),
+    palsySide: text("palsySide"),
+    admCMAP: numeric("aDMcMAP"),
+    fdiCMAP: numeric("fDIcMAP"),
+    SNAP: numeric("SNAP"),
+    postMed: numeric("postMed"),
+    "2PDSmall": numeric("2PDSmall"),
+    "2PDRing": numeric("2PDRing"),
+    "2PDNormal": numeric("2PDNormal"),
+    gripIH: numeric("gripIH"),
+    pinchIH: numeric("pinchIH"),
+    fdi: numeric("fdi"),
+    digAbd: numeric("digAbd"),
+    raAdd: numeric("raAdd"),
+    uiAdd: numeric("uiAdd"),
+    froment: integer("froment"),
+    clawing: integer("clawing"),
+    wart: integer("wart"),
+    intPlus: integer("intPlus"),
+    bsrs: numeric("bsrs"),
+    sf36: numeric("sf36"),
+    dash: numeric("dash"),
+})

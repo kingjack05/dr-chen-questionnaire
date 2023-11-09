@@ -5,6 +5,7 @@ import {
     date,
     text,
     boolean,
+    unique,
 } from "drizzle-orm/pg-core"
 import { patient } from "../patients/schema"
 
@@ -30,6 +31,9 @@ export const michiganHandOutcomeResponse = pgTable(
         previousJob: text("previousJob"),
         currentJob: text("currentJob"),
     },
+    (t) => ({
+        unq: unique().on(t.patientId, t.date),
+    }),
 )
 
 const sf36Questions: {
@@ -38,15 +42,21 @@ const sf36Questions: {
 for (let i = 1; i <= 36; i++) {
     sf36Questions[`q${i}`] = integer(`q${i}`)
 }
-export const sf36Response = pgTable("sf36Response", {
-    id: serial("id").primaryKey(),
-    date: date("date", { mode: "date" }).notNull().defaultNow(),
-    patientId: integer("patientId")
-        .references(() => patient.id)
-        .notNull(),
-    done: boolean("done"),
-    ...sf36Questions,
-})
+export const sf36Response = pgTable(
+    "sf36Response",
+    {
+        id: serial("id").primaryKey(),
+        date: date("date", { mode: "date" }).notNull().defaultNow(),
+        patientId: integer("patientId")
+            .references(() => patient.id)
+            .notNull(),
+        done: boolean("done"),
+        ...sf36Questions,
+    },
+    (t) => ({
+        unq: unique().on(t.patientId, t.date),
+    }),
+)
 
 const sf12Questions: {
     [qNum: string]: any
@@ -54,15 +64,21 @@ const sf12Questions: {
 for (let i = 1; i <= 12; i++) {
     sf12Questions[`q${i}`] = integer(`q${i}`)
 }
-export const sf12Response = pgTable("sf12Response", {
-    id: serial("id").primaryKey(),
-    date: date("date", { mode: "date" }).notNull().defaultNow(),
-    patientId: integer("patientId")
-        .references(() => patient.id)
-        .notNull(),
-    done: boolean("done"),
-    ...sf12Questions,
-})
+export const sf12Response = pgTable(
+    "sf12Response",
+    {
+        id: serial("id").primaryKey(),
+        date: date("date", { mode: "date" }).notNull().defaultNow(),
+        patientId: integer("patientId")
+            .references(() => patient.id)
+            .notNull(),
+        done: boolean("done"),
+        ...sf12Questions,
+    },
+    (t) => ({
+        unq: unique().on(t.patientId, t.date),
+    }),
+)
 
 const dashQuestions: {
     [qNum: string]: any
@@ -70,19 +86,25 @@ const dashQuestions: {
 for (let i = 1; i <= 38; i++) {
     dashQuestions[`q${i}`] = integer(`q${i}`)
 }
-export const dashResponse = pgTable("dashResponse", {
-    id: serial("id").primaryKey(),
-    date: date("date", { mode: "date" }).notNull().defaultNow(),
-    patientId: integer("patientId")
-        .references(() => patient.id)
-        .notNull(),
-    done: boolean("done"),
-    ...dashQuestions,
-    hasJob: integer("hasJob"),
-    job: text("job"),
-    hasSportOrInstrument: integer("hasSportOrInstrument"),
-    sportOrInstrument: text("sportOrInstrument"),
-})
+export const dashResponse = pgTable(
+    "dashResponse",
+    {
+        id: serial("id").primaryKey(),
+        date: date("date", { mode: "date" }).notNull().defaultNow(),
+        patientId: integer("patientId")
+            .references(() => patient.id)
+            .notNull(),
+        done: boolean("done"),
+        ...dashQuestions,
+        hasJob: integer("hasJob"),
+        job: text("job"),
+        hasSportOrInstrument: integer("hasSportOrInstrument"),
+        sportOrInstrument: text("sportOrInstrument"),
+    },
+    (t) => ({
+        unq: unique().on(t.patientId, t.date),
+    }),
+)
 
 const qDashQuestions: {
     [qNum: string]: any
@@ -90,19 +112,25 @@ const qDashQuestions: {
 for (let i = 1; i <= 19; i++) {
     qDashQuestions[`q${i}`] = integer(`q${i}`)
 }
-export const qDashResponse = pgTable("qDashResponse", {
-    id: serial("id").primaryKey(),
-    date: date("date", { mode: "date" }).notNull().defaultNow(),
-    patientId: integer("patientId")
-        .references(() => patient.id)
-        .notNull(),
-    done: boolean("done"),
-    ...qDashQuestions,
-    hasJob: integer("hasJob"),
-    job: text("job"),
-    hasSportOrInstrument: integer("hasSportOrInstrument"),
-    sportOrInstrument: text("sportOrInstrument"),
-})
+export const qDashResponse = pgTable(
+    "qDashResponse",
+    {
+        id: serial("id").primaryKey(),
+        date: date("date", { mode: "date" }).notNull().defaultNow(),
+        patientId: integer("patientId")
+            .references(() => patient.id)
+            .notNull(),
+        done: boolean("done"),
+        ...qDashQuestions,
+        hasJob: integer("hasJob"),
+        job: text("job"),
+        hasSportOrInstrument: integer("hasSportOrInstrument"),
+        sportOrInstrument: text("sportOrInstrument"),
+    },
+    (t) => ({
+        unq: unique().on(t.patientId, t.date),
+    }),
+)
 
 const bctQuestions: {
     [qNum: string]: any
@@ -110,15 +138,21 @@ const bctQuestions: {
 for (let i = 1; i <= 19; i++) {
     bctQuestions[`q${i}`] = integer(`q${i}`)
 }
-export const bctResponse = pgTable("bctResponse", {
-    id: serial("id").primaryKey(),
-    date: date("date", { mode: "date" }).notNull().defaultNow(),
-    patientId: integer("patientId")
-        .references(() => patient.id)
-        .notNull(),
-    done: boolean("done"),
-    ...bctQuestions,
-})
+export const bctResponse = pgTable(
+    "bctResponse",
+    {
+        id: serial("id").primaryKey(),
+        date: date("date", { mode: "date" }).notNull().defaultNow(),
+        patientId: integer("patientId")
+            .references(() => patient.id)
+            .notNull(),
+        done: boolean("done"),
+        ...bctQuestions,
+    },
+    (t) => ({
+        unq: unique().on(t.patientId, t.date),
+    }),
+)
 
 const bsrsQuestions: {
     [qNum: string]: any
@@ -126,15 +160,21 @@ const bsrsQuestions: {
 for (let i = 1; i <= 30; i++) {
     bsrsQuestions[`q${i}`] = integer(`q${i}`)
 }
-export const bsrsResponse = pgTable("bsrsResponse", {
-    id: serial("id").primaryKey(),
-    date: date("date", { mode: "date" }).notNull().defaultNow(),
-    patientId: integer("patientId")
-        .references(() => patient.id)
-        .notNull(),
-    done: boolean("done"),
-    ...bsrsQuestions,
-})
+export const bsrsResponse = pgTable(
+    "bsrsResponse",
+    {
+        id: serial("id").primaryKey(),
+        date: date("date", { mode: "date" }).notNull().defaultNow(),
+        patientId: integer("patientId")
+            .references(() => patient.id)
+            .notNull(),
+        done: boolean("done"),
+        ...bsrsQuestions,
+    },
+    (t) => ({
+        unq: unique().on(t.patientId, t.date),
+    }),
+)
 
 const whoqolBrefQuestions: {
     [qNum: string]: any
@@ -142,12 +182,18 @@ const whoqolBrefQuestions: {
 for (let i = 1; i <= 28; i++) {
     whoqolBrefQuestions[`q${i}`] = integer(`q${i}`)
 }
-export const whoqolBrefResponse = pgTable("whoqolBrefResponse", {
-    id: serial("id").primaryKey(),
-    date: date("date", { mode: "date" }).notNull().defaultNow(),
-    patientId: integer("patientId")
-        .references(() => patient.id)
-        .notNull(),
-    done: boolean("done"),
-    ...whoqolBrefQuestions,
-})
+export const whoqolBrefResponse = pgTable(
+    "whoqolBrefResponse",
+    {
+        id: serial("id").primaryKey(),
+        date: date("date", { mode: "date" }).notNull().defaultNow(),
+        patientId: integer("patientId")
+            .references(() => patient.id)
+            .notNull(),
+        done: boolean("done"),
+        ...whoqolBrefQuestions,
+    },
+    (t) => ({
+        unq: unique().on(t.patientId, t.date),
+    }),
+)

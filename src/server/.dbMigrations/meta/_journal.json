@@ -64,6 +64,13 @@
       "when": 1699448042244,
       "tag": "0008_big_zodiak",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1699518910113,
+      "tag": "0009_smart_synch",
+      "breakpoints": true
     }
   ]
 }

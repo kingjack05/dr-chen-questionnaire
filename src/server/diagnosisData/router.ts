@@ -2,13 +2,14 @@ import { z } from "zod"
 import { eq, and } from "drizzle-orm"
 
 import { createTRPCRouter, adminProcedure } from "../trpcInstance"
-import { raynaudData } from "./schema"
+import { AINData, raynaudData } from "./schema"
 import { db } from "../db"
 import { patient } from "../schemaIndex"
 import type { PgTableWithColumns } from "drizzle-orm/pg-core"
 
 const tableMap: { [diagnosis: string]: PgTableWithColumns<any> } = {
     Raynaud: raynaudData,
+    "AIN Compression": AINData,
 }
 
 export const diagnosisDataRouter = createTRPCRouter({
@@ -53,6 +54,18 @@ export const diagnosisDataRouter = createTRPCRouter({
                     console.log(error)
                 }
             }
+
+            if (diagnosis === "AIN Compression") {
+                try {
+                    const result = await db.insert(AINData).values([
+                        { patientId, postOPMonth: 0 },
+                        { patientId, postOPMonth: 1 },
+                    ])
+                    return result
+                } catch (error) {
+                    console.log(error)
+                }
+            }
         }),
     setData: adminProcedure
         .input(
@@ -65,20 +78,18 @@ export const diagnosisDataRouter = createTRPCRouter({
         )
         .mutation(async ({ input }) => {
             const { rowId, diagnosis, colName, value } = input
-
-            if (diagnosis === "Raynaud") {
-                try {
-                    const result = await db
-                        .update(raynaudData)
-                        .set({ [colName]: value })
-                        .where(eq(raynaudData.id, rowId))
-                    return result
-                } catch (error) {
-                    console.log(error)
-                }
+            const table = tableMap[diagnosis]
+            try {
+                const result = await db
+                    .update(table)
+                    .set({ [colName]: value })
+                    .where(eq(table.id, rowId))
+                return result
+            } catch (error) {
+                console.log(error)
             }
         }),
     test: adminProcedure.query(() => {
-        return Object.keys(raynaudData).map((key) => ({ field: key }))
+        return Object.keys(AINData).map((key) => ({ field: key }))
     }),
 })

@@ -4,6 +4,20 @@ export const tableConfigsFactory = (table: "Raynaud" | "AIN Compression") => {
     if (table === "Raynaud") {
         return RaynaudTableConfigs()
     }
+    if (table === "AIN Compression") {
+        return AINTableConfigs()
+    }
+}
+
+function getAge(dateString: string) {
+    var today = new Date()
+    var birthDate = new Date(dateString)
+    var age = today.getFullYear() - birthDate.getFullYear()
+    var m = today.getMonth() - birthDate.getMonth()
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--
+    }
+    return age
 }
 
 const RaynaudTableConfigs = () => {
@@ -17,6 +31,7 @@ const RaynaudTableConfigs = () => {
                   name: item.patient.name,
                   gender: item.patient.gender,
                   birthday: item.patient.birthday,
+                  age: getAge(item.patient.birthday),
                   ...item.raynaudData,
               }
           })
@@ -35,6 +50,11 @@ const RaynaudTableConfigs = () => {
                 },
                 {
                     field: "birthday",
+                    columnGroupShow: "open",
+                    editable: false,
+                },
+                {
+                    field: "age",
                     columnGroupShow: "open",
                     editable: false,
                 },
@@ -167,33 +187,39 @@ const RaynaudTableConfigs = () => {
                         {
                             headerName: "Michigan",
                             children: [
-                                { field: "MHOOverallR" },
-                                { field: "MHOOverallL" },
-                                { field: "MHOActivitiesROH" },
-                                { field: "MHOActivitiesROverall" },
-                                { field: "MHOActivitiesLOH" },
-                                { field: "MHOActivitiesLOverall" },
-                                { field: "MHOActivitiesTH" },
-                                { field: "MHOWork" },
-                                { field: "MHOPain" },
-                                { field: "MHOAestheticsR" },
-                                { field: "MHOAestheticsL" },
-                                { field: "MHOSatisfactionR" },
-                                { field: "MHOSatisfactionL" },
+                                { field: "MHOOverallR", editable: false },
+                                { field: "MHOOverallL", editable: false },
+                                { field: "MHOActivitiesROH", editable: false },
+                                {
+                                    field: "MHOActivitiesROverall",
+                                    editable: false,
+                                },
+                                { field: "MHOActivitiesLOH", editable: false },
+                                {
+                                    field: "MHOActivitiesLOverall",
+                                    editable: false,
+                                },
+                                { field: "MHOActivitiesTH", editable: false },
+                                { field: "MHOWork", editable: false },
+                                { field: "MHOPain", editable: false },
+                                { field: "MHOAestheticsR", editable: false },
+                                { field: "MHOAestheticsL", editable: false },
+                                { field: "MHOSatisfactionR", editable: false },
+                                { field: "MHOSatisfactionL", editable: false },
                             ],
                             columnGroupShow: "open",
                         },
                         {
                             headerName: "SF36",
                             children: [
-                                { field: "SF36PhyFunc" },
-                                { field: "SF36RolePhy" },
-                                { field: "SF36BodyPain" },
-                                { field: "SF36GenHealth" },
-                                { field: "SF36Vitality" },
-                                { field: "SF36SocialFunc" },
-                                { field: "SF36RoleEmotion" },
-                                { field: "SF36MentalHealth" },
+                                { field: "SF36PhyFunc", editable: false },
+                                { field: "SF36RolePhy", editable: false },
+                                { field: "SF36BodyPain", editable: false },
+                                { field: "SF36GenHealth", editable: false },
+                                { field: "SF36Vitality", editable: false },
+                                { field: "SF36SocialFunc", editable: false },
+                                { field: "SF36RoleEmotion", editable: false },
+                                { field: "SF36MentalHealth", editable: false },
                             ],
                             columnGroupShow: "open",
                         },
@@ -218,6 +244,102 @@ const RaynaudTableConfigs = () => {
                 },
                 {
                     colId: "postOPYear",
+                    sort: "asc",
+                },
+            ],
+        }
+        event.columnApi.applyColumnState(columnState)
+    }
+
+    return { rowData, columnDefs, rowIDGetter, onGridReady }
+}
+
+const AINTableConfigs = () => {
+    const data = trpc.diagnosisData.getAllData.useQuery({
+        diagnosis: "AIN Compression",
+    }).data
+
+    const rowData = data
+        ? data.map((item) => {
+              return {
+                  name: item.patient.name,
+                  gender: item.patient.gender,
+                  birthday: item.patient.birthday,
+                  age: getAge(item.patient.birthday),
+                  ...item.AINData,
+              }
+          })
+        : []
+
+    const columnDefs = [
+        {
+            headerName: "基本資料",
+            children: [
+                { field: "patientId", editable: false },
+                { field: "name", columnGroupShow: "open", editable: false },
+                {
+                    field: "gender",
+                    columnGroupShow: "open",
+                    editable: false,
+                },
+                {
+                    field: "birthday",
+                    columnGroupShow: "open",
+                    editable: false,
+                },
+                {
+                    field: "age",
+                    columnGroupShow: "open",
+                    editable: false,
+                },
+            ],
+        },
+        {
+            headerName: "疾病資料",
+            children: [{ field: "group" }, { field: "palsySide" }],
+        },
+        {
+            headerName: "追蹤資料",
+            children: [
+                { field: "postOPMonth" },
+                { field: "admCMAP" },
+                { field: "fdiCMAP" },
+                { field: "SNAP" },
+                { field: "postMed" },
+                { field: "2PDSmall" },
+                { field: "2PDRing" },
+                { field: "2PDNormal" },
+                { field: "gripIH" },
+                { field: "pinchIH" },
+                { field: "fdi" },
+                { field: "digAbd" },
+                { field: "raAdd" },
+                { field: "uiAdd" },
+                { field: "froment" },
+                { field: "clawing" },
+                { field: "wart" },
+                { field: "intPlus" },
+                { field: "bsrs", editable: false },
+                { field: "sf36", editable: false },
+                { field: "dash", editable: false },
+            ],
+        },
+    ]
+
+    const rowIDGetter = (params: any) => {
+        return `${params.data.id}${params.data.patientId}${params.data.postOPMonth}`
+    }
+
+    const onGridReady = (event: any) => {
+        const columnState = {
+            // https://www.ag-grid.com/javascript-grid-column-state/#column-state-interface
+            state: [
+                {
+                    colId: "patientId",
+                    sort: "asc",
+                },
+                {
+                    colId: "postOPMonth",
                     sort: "asc",
                 },
             ],

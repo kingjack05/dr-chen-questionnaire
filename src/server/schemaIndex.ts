@@ -1,5 +1,5 @@
 import { admins } from "./admin/schema"
-import { raynaudData } from "./diagnosisData/schema"
+import { raynaudData, AINData } from "./diagnosisData/schema"
 import { patient } from "./patients/schema"
 import {
     michiganHandOutcomeResponse,
@@ -24,4 +24,5 @@ export {
     whoqolBrefResponse,
     admins,
     raynaudData,
+    AINData,
 }

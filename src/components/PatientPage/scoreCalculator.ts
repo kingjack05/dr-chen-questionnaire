@@ -102,9 +102,9 @@ const SF36Calculator: CalculatorFunc = (data) => {
     const RP = q13 + q14 + q15 + q16 // Role physical
     const RPTransformed = 25 * (RP - 4)
     const RPZStandardized = (RPTransformed - 81.19907) / 33.79729
-    const BD = q21Value + q22Value // Bodily Pain
-    const BDTransformed = 10 * (BD - 2)
-    const BDZStandardized = (BDTransformed - 75.49196) / 23.55879
+    const BP = q21Value + q22Value // Bodily Pain
+    const BPTransformed = 10 * (BP - 2)
+    const BPZStandardized = (BPTransformed - 75.49196) / 23.55879
     const GH = q1Value + q33 + q34Value + q35 + q36Value // General health
     const GHTransformed = 5 * (GH - 5)
     const GHZStandardized = (GHTransformed - 72.21316) / 20.16964
@@ -124,7 +124,7 @@ const SF36Calculator: CalculatorFunc = (data) => {
     const AGG_PHYS =
         PFZStandardized * 0.42402 +
         RPZStandardized * 0.35119 +
-        BDZStandardized * 0.31754 +
+        BPZStandardized * 0.31754 +
         GHZStandardized * 0.24954 +
         VZStandardized * 0.02877 +
         SFZStandardized * -0.00753 +
@@ -133,7 +133,7 @@ const SF36Calculator: CalculatorFunc = (data) => {
     const AGG_MENT =
         PFZStandardized * -0.22999 +
         RPZStandardized * -0.12329 +
-        BDZStandardized * -0.09731 +
+        BPZStandardized * -0.09731 +
         GHZStandardized * -0.01571 +
         VZStandardized * 0.23534 +
         SFZStandardized * 0.26876 +
@@ -146,6 +146,14 @@ const SF36Calculator: CalculatorFunc = (data) => {
     const dimensions: Array<DimensionScore> = [
         { dimensionName: "Physical Component Score", score: PCS },
         { dimensionName: "Mental Component Score", score: MCS },
+        { dimensionName: "Physical Function", score: PFZStandardized },
+        { dimensionName: "Role Physical", score: RPZStandardized },
+        { dimensionName: "Body Pain", score: BPZStandardized },
+        { dimensionName: "General Health", score: GHZStandardized },
+        { dimensionName: "Vitality", score: VZStandardized },
+        { dimensionName: "Social Function", score: SFZStandardized },
+        { dimensionName: "Role Emotion", score: REZStandardized },
+        { dimensionName: "Mental Health", score: MHZStandardized },
     ]
     return { totalScore, dimensions }
 }
