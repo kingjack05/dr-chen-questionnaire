@@ -1,48 +1,32 @@
-import { Toaster } from "react-hot-toast"
+import toast, { Toaster } from "react-hot-toast"
 import { useState } from "react"
 import { Combobox } from "@headlessui/react"
 
 import { trpc } from "../../trpc"
+import { scoreCalculator } from "../../PatientPage/scoreCalculator"
 
-export const ActionPanel = ({ api, columnApi }) => {
-    return (
-        <>
-            <h6 className=" mb-1">新增病人</h6>
-            <AddRow />
-            <h6 className=" mb-1 mt-2">載入問卷資料</h6>
-            <div>
-                <select>
-                    <option>2022-09-22</option>
-                </select>
-            </div>
-            <button
-                className="btn mt-1 p-2"
-                onClick={() => {
-                    const selectedRow = api.getSelectedRows()
-                    const transaction = {
-                        update: [
-                            {
-                                ...selectedRow[0],
-                                overallHandFunctionRight: "3",
-                                overallHandFunctionLeft: "4",
-                            },
-                        ],
-                    }
-                    api.applyTransaction(transaction)
-                }}
-            >
-                載入資料
-            </button>
-            <Toaster />
-        </>
-    )
+const dimensionsToColnameMap = {
+    "手部整體功能 - 右手": "MHOOverallR",
+    "手部整體功能 - 左手": "MHOOverallL",
+    "日常活動 - 右手單手": "MHOActivitiesROH",
+    "日常活動 - 右手整體": "MHOActivitiesROverall",
+    "日常活動 - 左手單手": "MHOActivitiesLOH",
+    "日常活動 - 左手整體": "MHOActivitiesLOverall",
+    "日常活動 - 雙手": "MHOActivitiesTH",
+    工作: "MHOWork",
+    疼痛: "MHOPain",
+    "美觀 - 右手": "MHOAestheticsR",
+    "美觀 - 左手": "MHOAestheticsL",
+    "滿意度 - 右手": "MHOSatisfactionR",
+    "滿意度 - 左手": "MHOSatisfactionL",
 }
 
-const AddRow = () => {
+export const ActionPanel = ({ api, columnApi }) => {
     const patientIDAndNames =
         trpc.patient.getPatientsIdAndName.useQuery().data ?? []
 
     const queryParameters = new URLSearchParams(window.location.search)
+
     const defaultPatientID = queryParameters.get("id") ?? "10836635"
     const diagnosis = queryParameters.get("table") ?? "Raynaud"
     const [patientId, setPatientId] = useState(defaultPatientID)
@@ -59,6 +43,19 @@ const AddRow = () => {
           })
         : []
 
+    const [questionnaire, setQuestionnaire] = useState("MHO")
+    const QuestionnaireData =
+        trpc.questionnaire.responseByPatient
+            .useQuery({
+                questionnaire,
+                patientId: Number(patientId),
+            })
+            .data?.filter(({ done }) => done) ?? []
+    const [selectedDate, setSelectedDate] = useState("")
+
+    if (!QuestionnaireData) {
+        return <>Loading...</>
+    }
     return (
         <>
             <div className="relative">
@@ -116,8 +113,66 @@ const AddRow = () => {
                     }
                 }}
             >
-                新增
+                新增病人資料
             </button>
+            <h6 className=" mb-1 mt-2">載入問卷資料</h6>
+            <div>
+                <select
+                    value={questionnaire}
+                    onChange={(e) => {
+                        setQuestionnaire(e.target.value)
+                    }}
+                >
+                    <option value="MHO">MHO</option>
+                    <option value="SF36">SF36</option>
+                </select>
+                {QuestionnaireData.length === 0 ? <>沒有問卷資料</> : <></>}
+                {QuestionnaireData.length > 0 ? (
+                    <select
+                        value={selectedDate}
+                        onChange={(e) => {
+                            setSelectedDate(e.target.value)
+                        }}
+                    >
+                        <option value="">請選擇日期</option>
+                        {QuestionnaireData.map(({ date }) => (
+                            <option value={date.toISOString().substring(0, 10)}>
+                                {date.toISOString().substring(0, 10)}
+                            </option>
+                        ))}
+                    </select>
+                ) : (
+                    <></>
+                )}
+            </div>
+            <button
+                className="btn mt-1 p-2"
+                onClick={async () => {
+                    const selectedRow = api.getSelectedRows()
+                    if (!selectedRow) {
+                        toast.error("請選擇載入位置")
+                        return
+                    }
+                    if (!selectedDate) {
+                        toast.error("請選擇載入日期")
+                        return
+                    }
+                    const selectedQuestionnaireData = QuestionnaireData.find(
+                        ({ date }) =>
+                            date.toISOString().substring(0, 10) ===
+                            selectedDate,
+                    )
+                    const { totalScore, dimensions } = scoreCalculator(
+                        selectedQuestionnaireData,
+                        questionnaire,
+                    )
+                    console.log(dimensions)
+                    console.log(selectedRow[0].id)
+                }}
+            >
+                載入資料
+            </button>
+            <Toaster />
         </>
     )
 }

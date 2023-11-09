@@ -23,7 +23,7 @@ export const adminRouter = createTRPCRouter({
 
             const user = results[0].username
             const token = jwt.sign(
-                user,
+                { user },
                 import.meta.env.AWS_SECRET_ACCESS_KEY ??
                     process.env.AWS_SECRET_ACCESS_KEY,
                 { expiresIn: "10h" },
