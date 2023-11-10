@@ -4,6 +4,7 @@ import "ag-grid-community/styles/ag-grid.css"
 import "ag-grid-community/styles/ag-theme-alpine.css"
 import "ag-grid-enterprise"
 import { useMemo } from "react"
+
 import { StatisticalAnalysisPanel } from "./custom tool panels/StatisticalAnalysisPanel"
 import { ActionPanel } from "./custom tool panels/ActionPanel"
 import { trpc } from "../trpc"
@@ -76,6 +77,8 @@ const DataStudioPageWithoutProvider = () => {
                         },
                     ],
                 }}
+                enableRangeSelection={true}
+                enableCharts={true}
             ></AgGridReact>
         </div>
     )
