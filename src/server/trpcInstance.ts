@@ -62,13 +62,19 @@ export const createTRPCContext = async (opts: CreateAstroContextOptions) => {
     async function getUserFromHeader() {
         const authorization = req?.headers.get("authorization")
         if (authorization) {
-            const user = jwt.verify(
-                authorization,
-                import.meta.env.AWS_SECRET_ACCESS_KEY ??
-                    process.env.AWS_SECRET_ACCESS_KEY,
-            )
+            try {
+                const user = jwt.verify(
+                    authorization,
+                    import.meta.env.AWS_SECRET_ACCESS_KEY ??
+                        process.env.AWS_SECRET_ACCESS_KEY,
+                )
 
-            return user
+                return user
+            } catch (error) {
+                console.log(authorization)
+                console.log(error)
+                return null
+            }
         }
         return null
     }
