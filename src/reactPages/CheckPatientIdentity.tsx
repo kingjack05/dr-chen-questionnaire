@@ -75,7 +75,9 @@ export const CheckPatientIdentityPageWithoutProvider = () => {
                         </button>
                     </div>
                 </div>
-                <div className="text-red-400">{errMsg}</div>
+                <div className="w-96 overflow-scroll text-red-400">
+                    {errMsg}
+                </div>
             </div>
             <Toaster />
         </div>
