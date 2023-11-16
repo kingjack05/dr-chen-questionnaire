@@ -24,12 +24,17 @@ export const patientRouter = createTRPCRouter({
     patientByNameAndBDay: publicProcedure
         .input(z.object({ name: z.string(), bday: z.date() }))
         .mutation(async (req) => {
-            const result = await db.query.patient.findFirst({
-                where: (patient, { eq }) =>
-                    eq(patient.name, req.input.name) &&
-                    eq(patient.birthday, req.input.bday),
-            })
-            return result
+            try {
+                console.log("name: ", req.input.name, "bday: ", req.input.bday)
+                const result = await db.query.patient.findFirst({
+                    where: (patient, { eq }) =>
+                        eq(patient.name, req.input.name) &&
+                        eq(patient.birthday, req.input.bday),
+                })
+                return result
+            } catch (error) {
+                console.log(error)
+            }
         }),
     getPatientsIdAndName: adminProcedure.query(async () => {
         const patients = await db.query.patient.findMany({

@@ -7,6 +7,7 @@ import { QueryContextProvider } from "../components/Providers/QueryContext"
 export const CheckPatientIdentityPageWithoutProvider = () => {
     const [name, setName] = useState("")
     const [bday, setBday] = useState("1990-06-01")
+    const [errMsg, setErrMsg] = useState("")
 
     const getPatient = trpc.patient.patientByNameAndBDay.useMutation()
 
@@ -43,29 +44,38 @@ export const CheckPatientIdentityPageWithoutProvider = () => {
                         <button
                             className="btn"
                             onClick={async () => {
-                                const result = await getPatient.mutateAsync({
-                                    name,
-                                    bday: new Date(bday),
-                                })
-                                if (!result) {
-                                    toast.error("登入失敗")
-                                    return
+                                try {
+                                    const result = await getPatient.mutateAsync(
+                                        {
+                                            name,
+                                            bday: new Date(bday),
+                                        },
+                                    )
+                                    if (!result) {
+                                        toast.error("登入失敗")
+                                        setErrMsg("登入失敗")
+                                        return
+                                    }
+                                    toast.success("登入成功")
+                                    window.open(
+                                        `/questionnaires?id=${
+                                            result.id
+                                        }&followingQuestionnaires=${result.followingQuestionnaires?.join(
+                                            "+",
+                                        )}`,
+                                    )
+                                    console.log(result)
+                                } catch (error) {
+                                    setErrMsg(JSON.stringify(error))
+                                    console.log(error)
                                 }
-                                toast.success("登入成功")
-                                window.open(
-                                    `/questionnaires?id=${
-                                        result.id
-                                    }&followingQuestionnaires=${result.followingQuestionnaires?.join(
-                                        "+",
-                                    )}`,
-                                )
-                                console.log(result)
                             }}
                         >
                             提交
                         </button>
                     </div>
                 </div>
+                <div className="text-red-400">{errMsg}</div>
             </div>
             <Toaster />
         </div>
