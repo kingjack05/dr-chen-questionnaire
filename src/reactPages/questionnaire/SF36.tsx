@@ -183,11 +183,12 @@ export const SF36 = ({ patientId }: SF36PropType) => {
                 question="21. 在過去一個月內，您身體疼痛程度有多嚴重？"
                 colName="q21"
                 options={[
-                    "完全沒有妨礙",
-                    "有一點妨礙",
-                    "中度妨礙",
-                    "相當多妨礙",
-                    "妨礙到極點",
+                    "完全不痛",
+                    "非常輕微的痛",
+                    "輕微的痛",
+                    "中度的痛",
+                    "嚴重的痛",
+                    "非常嚴重的痛",
                 ]}
                 defaultValue={String(responseData["q21"])}
                 handleChange={handleQRadioChange}

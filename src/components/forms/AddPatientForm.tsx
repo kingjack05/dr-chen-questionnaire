@@ -126,7 +126,10 @@ export const AddPatientForm = ({ onSubmit }: PropTypes) => {
                                                 ["BSRS", "SF36", "DASH"],
                                             )
                                         }
-                                        if (diagnosis === "Raynaud") {
+                                        if (
+                                            diagnosis === "Raynaud" ||
+                                            diagnosis === "RA"
+                                        ) {
                                             setValue(
                                                 "followingQuestionnaires",
                                                 ["MHO", "SF36"],
