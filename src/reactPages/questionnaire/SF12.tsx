@@ -87,6 +87,7 @@ export const SF12 = ({ patientId }: PropType) => {
     }
     return (
         <div className="mb-40">
+            <div className="mb-4 text-gray-300">問卷名: SF12</div>
             <QuestionRadio
                 question="1. 整體上，您認為您目前的健康狀況是"
                 colName="q1"
@@ -172,7 +173,6 @@ export const SF12 = ({ patientId }: PropType) => {
                 ]}
                 handleChange={handleQRadioGroupChange}
                 valueGetter={valueGetter}
-                questionWidth="lg"
             />
             <QuestionRadio
                 question="12. 在過去一個月內，您的身體健康或情緒問題有多少時候會妨礙您的社交活動?（如拜訪親友等）"

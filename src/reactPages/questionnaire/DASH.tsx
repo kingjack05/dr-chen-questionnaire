@@ -87,6 +87,9 @@ export const DASH = ({ patientId }: PropType) => {
     }
     return (
         <div className="mb-40">
+            <div className="mb-4 text-gray-300">
+                問卷名: DASH (Disabilities of the Arm, Shoulder and Hand)
+            </div>
             <div className="mb-2 mt-8 text-lg sm:text-2xl">活動能力</div>
             <div className="mb-2 text-gray-500">
                 請評估您過去一星期內從事下列活動的能力

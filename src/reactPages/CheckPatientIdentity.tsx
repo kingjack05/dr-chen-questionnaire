@@ -57,15 +57,14 @@ export const CheckPatientIdentityPageWithoutProvider = () => {
                                         return
                                     }
                                     toast.success("登入成功")
-                                    window.open(
-                                        `/questionnaires?id=${
-                                            result.id
-                                        }&followingQuestionnaires=${result.followingQuestionnaires?.join(
-                                            "+",
-                                        )}`,
-                                    )
+                                    window.location.href = `/questionnaires?id=${
+                                        result.id
+                                    }&followingQuestionnaires=${result.followingQuestionnaires?.join(
+                                        "+",
+                                    )}`
                                     console.log(result)
                                 } catch (error) {
+                                    toast.error("登入失敗")
                                     setErrMsg(JSON.stringify(error))
                                     console.log(error)
                                 }
@@ -75,7 +74,7 @@ export const CheckPatientIdentityPageWithoutProvider = () => {
                         </button>
                     </div>
                 </div>
-                <div className="w-96 overflow-scroll text-red-400">
+                <div className="max-w-sm overflow-auto text-red-400">
                     {errMsg}
                 </div>
             </div>

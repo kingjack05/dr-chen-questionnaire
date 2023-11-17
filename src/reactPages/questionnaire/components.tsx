@@ -15,7 +15,7 @@ export const RadioGroup = ({
     defaultValue,
 }: RadioGroupPropType) => {
     return (
-        <div className="flex flex-grow justify-around">
+        <div className="flex flex-grow flex-col justify-around gap-y-1 sm:flex-row sm:gap-0">
             {options.map((option, index) => {
                 return (
                     <label className="flex items-center" key={index}>
@@ -25,6 +25,19 @@ export const RadioGroup = ({
                             value={index + 1}
                             onChange={(e) => {
                                 handleChange(e, colName)
+                            }}
+                            onFocus={(e) => {
+                                const bounding =
+                                    e.target.getBoundingClientRect()
+                                const isInViewport =
+                                    bounding.top >= 0 &&
+                                    bounding.bottom <= window.innerHeight
+                                if (!isInViewport) {
+                                    e.target.scrollIntoView({
+                                        behavior: "smooth",
+                                        block: "center",
+                                    })
+                                }
                             }}
                             checked={
                                 defaultValue === String(index + 1)
@@ -61,8 +74,7 @@ export const QuestionRadioGroup = ({
     const widthVariants: {
         [variant: string]: { width: string; margin: string }
     } = {
-        base: { width: "sm:w-80", margin: "ml-80" },
-        lg: { width: "sm:w-96", margin: "ml-96" },
+        base: { width: "sm:w-96", margin: "ml-96" },
         xl: { width: "sm:w-[580px]", margin: "ml-[580px]" },
     }
 
@@ -77,7 +89,10 @@ export const QuestionRadioGroup = ({
             >
                 {options.map((option) => {
                     return (
-                        <div className="text- text-base vertical-writing-rl">
+                        <div
+                            className=" text-base vertical-writing-rl"
+                            key={option}
+                        >
                             {option}
                         </div>
                     )
@@ -85,11 +100,18 @@ export const QuestionRadioGroup = ({
             </div>
             {questions.map((question, index) => {
                 const qNum = startingQNum + index
+                const hasValue =
+                    valueGetter(qNum) && valueGetter(qNum) !== "null"
 
                 return (
-                    <div className="mb-2 sm:flex" key={qNum}>
+                    <div
+                        className="my-8 focus-within:bg-gray-200 sm:flex"
+                        key={qNum}
+                    >
                         <div
-                            className={`${widthVariants[questionWidth].width}`}
+                            className={`${widthVariants[questionWidth].width} ${
+                                hasValue ? "text-gray-400" : ""
+                            }`}
                         >
                             {qNum}. {question}
                         </div>
@@ -138,9 +160,17 @@ export const QuestionRadio = <T,>({
         col: "flex-col",
     }
 
+    const hasValue = defaultValue !== "null"
+
     return (
         <div className="mb-2 flex-wrap sm:flex">
-            <div className={`${widthVariants[questionWidth]}`}>{question}</div>
+            <div
+                className={`${widthVariants[questionWidth]} ${
+                    hasValue ? "text-gray-400" : ""
+                }`}
+            >
+                {question}
+            </div>
             <div
                 className={
                     "flex flex-grow justify-between " +

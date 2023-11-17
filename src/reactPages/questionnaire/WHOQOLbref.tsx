@@ -92,6 +92,9 @@ export const WHOQOLbref = ({ patientId }: PropType) => {
     }
     return (
         <div className="mb-40">
+            <div className="mb-4 text-gray-300">
+                問卷名: WHOQOLbref (Quality of Life)
+            </div>
             <QuestionRadio
                 question="1. 整體來說，您如何評價您的生活品質？"
                 colName="q1"

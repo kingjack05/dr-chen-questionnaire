@@ -87,6 +87,9 @@ export const BCT = ({ patientId }: PropType) => {
     }
     return (
         <div className="mb-40">
+            <div className="mb-4 text-gray-300">
+                問卷名: Boston Carpal Tunnel Questionnaire
+            </div>
             <div className="mb-2 mt-8 text-lg sm:text-2xl">症狀嚴重程度</div>
             <div className="mb-2 text-gray-500">
                 請依據過去兩週內，每天24小時中產生的症狀回答

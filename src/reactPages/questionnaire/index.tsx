@@ -83,7 +83,7 @@ export const QuestionnairesPageWithoutProvider = () => {
                 }}
             >
                 {QuestionnaireMapper[currentQuestionnaire]}
-                <div className="fixed bottom-0 left-0 h-20 w-full bg-gray-100 py-4 sm:h-24 sm:py-6">
+                <div className="fixed bottom-0 left-0 h-20 w-full bg-gray-100 px-2 py-4 sm:h-24 sm:py-6">
                     <div className="flex sm:mx-auto sm:max-w-3xl">
                         <div className="flex-grow">
                             <div className=" text-sm">進度</div>
@@ -91,13 +91,13 @@ export const QuestionnairesPageWithoutProvider = () => {
                                 <div
                                     className="h-2 bg-blue-600"
                                     style={{
-                                        width: 2.4 * completePercentage,
+                                        width: 2 * completePercentage,
                                     }}
                                 ></div>
                                 <div
                                     className="h-2 bg-gray-200"
                                     style={{
-                                        width: 2.4 * (100 - completePercentage),
+                                        width: 2 * (100 - completePercentage),
                                     }}
                                 ></div>
                             </div>
@@ -115,7 +115,7 @@ export const QuestionnairesPageWithoutProvider = () => {
                                     ? "下一頁"
                                     : "提交"}
                             </button>
-                            <div className="ml-4 text-sm text-gray-500">
+                            <div className=" ml-2 text-sm text-gray-500 sm:ml-4">
                                 ({questionnaireIndex + 1}/
                                 {followingQuestionnaires.length})
                             </div>

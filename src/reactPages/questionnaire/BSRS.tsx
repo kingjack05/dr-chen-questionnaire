@@ -73,6 +73,9 @@ export const BSRS = ({ patientId }: PropType) => {
     }
     return (
         <div className="mb-40">
+            <div className="mb-4 text-gray-300">
+                問卷名: Brief Symptom Rating Scale
+            </div>
             <div className="mb-2 text-gray-500">
                 下面所列舉的問題是一般人有時候會有的問題，請您仔細地閱讀每一個問題，同時回想在最近一星期中(包括今天)，這些問題使您感到困擾或苦惱的程度，然後圈選一個您認為最能代表您感覺的答案
             </div>
