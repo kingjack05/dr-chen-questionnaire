@@ -1,8 +1,10 @@
+import { useState, useCallback } from "react"
 import { trpc } from "../trpc"
+import type { GetContextMenuItemsParams } from "ag-grid-enterprise"
 
 export const tableConfigsFactory = (table: "Raynaud" | "AIN Compression") => {
     if (table === "Raynaud") {
-        return RaynaudTableConfigs()
+        return useRaynaudTableConfigs()
     }
     if (table === "AIN Compression") {
         return AINTableConfigs()
@@ -20,10 +22,20 @@ function getAge(dateString: string) {
     return age
 }
 
-const RaynaudTableConfigs = () => {
+const useRaynaudTableConfigs = () => {
+    const diagnosis = "Raynaud"
     const data = trpc.diagnosisData.getAllData.useQuery({
-        diagnosis: "Raynaud",
+        diagnosis,
     }).data
+    const refetch = trpc.diagnosisData.getAllData.useQuery({
+        diagnosis,
+    }).refetch
+
+    const addData = trpc.diagnosisData.addData.useMutation().mutateAsync
+    const saveData = trpc.diagnosisData.setData.useMutation().mutateAsync
+    const deleteData = trpc.diagnosisData.deleteData.useMutation().mutateAsync
+    // const questionnaireDataGetter =
+    //     trpc.questionnaire.responseByPatient.useQuery
 
     const rowData = data
         ? data.map((item) => {
@@ -33,6 +45,8 @@ const RaynaudTableConfigs = () => {
                   birthday: item.patient.birthday,
                   age: getAge(item.patient.birthday),
                   ...item.raynaudData,
+                  MHOData: item.michiganHandOutcomeResponse,
+                  SF36Data: item.sf36Response,
               }
           })
         : []
@@ -41,8 +55,8 @@ const RaynaudTableConfigs = () => {
         {
             headerName: "基本資料",
             children: [
-                { field: "patientId", editable: false },
-                { field: "name", columnGroupShow: "open", editable: false },
+                { field: "patientId", editable: false, pinned: "left" },
+                { field: "name", editable: false, pinned: "left" },
                 {
                     field: "gender",
                     columnGroupShow: "open",
@@ -172,7 +186,7 @@ const RaynaudTableConfigs = () => {
         {
             headerName: "追蹤資料",
             children: [
-                { field: "postOPYear" },
+                { field: "postOPYear", pinned: "left" },
                 { field: "discoloration" },
                 { field: "numbness" },
                 { field: "pain" },
@@ -251,13 +265,69 @@ const RaynaudTableConfigs = () => {
         event.columnApi.applyColumnState(columnState)
     }
 
-    return { rowData, columnDefs, rowIDGetter, onGridReady }
+    const getContextMenuItems = (params: GetContextMenuItemsParams) => {
+        if (!params.node) {
+            return ["export"]
+        }
+
+        const patientId = Number(params.node.data.patientId)
+
+        let items = [
+            "cut",
+            "copy",
+            "copyWithHeaders",
+            "copyWithGroupHeaders",
+            "paste",
+            "separator",
+            {
+                name: "新增資料",
+                action: async () => {
+                    if (!params.node) return
+
+                    await addData({
+                        diagnosis,
+                        patientId,
+                    })
+                    await refetch()
+                },
+            },
+            {
+                name: "刪除資料",
+                action: async () => {
+                    if (!params.node) return
+
+                    await deleteData({
+                        diagnosis,
+                        rowId: params.node.data.id,
+                    })
+                    await refetch()
+                },
+                cssClasses: ["text-red-400"],
+            },
+            "separator",
+            "chartRange",
+            "export",
+        ]
+        return items
+    }
+
+    return {
+        rowData,
+        columnDefs,
+        rowIDGetter,
+        onGridReady,
+        getContextMenuItems,
+    }
 }
 
 const AINTableConfigs = () => {
+    const diagnosis = "AIN Compression" as const
     const data = trpc.diagnosisData.getAllData.useQuery({
-        diagnosis: "AIN Compression",
+        diagnosis,
     }).data
+    const refetch = trpc.diagnosisData.getAllData.useQuery({
+        diagnosis,
+    }).refetch
 
     const rowData = data
         ? data.map((item) => {
@@ -275,8 +345,8 @@ const AINTableConfigs = () => {
         {
             headerName: "基本資料",
             children: [
-                { field: "patientId", editable: false },
-                { field: "name", columnGroupShow: "open", editable: false },
+                { field: "patientId", editable: false, pinned: "left" },
+                { field: "name", editable: false, pinned: "left" },
                 {
                     field: "gender",
                     columnGroupShow: "open",
@@ -301,7 +371,7 @@ const AINTableConfigs = () => {
         {
             headerName: "追蹤資料",
             children: [
-                { field: "postOPMonth" },
+                { field: "postOPMonth", pinned: "left" },
                 { field: "admCMAP" },
                 { field: "fdiCMAP" },
                 { field: "SNAP" },
@@ -347,5 +417,63 @@ const AINTableConfigs = () => {
         event.columnApi.applyColumnState(columnState)
     }
 
-    return { rowData, columnDefs, rowIDGetter, onGridReady }
+    const addData = trpc.diagnosisData.addData.useMutation().mutateAsync
+    const deleteData = trpc.diagnosisData.deleteData.useMutation().mutateAsync
+
+    const getContextMenuItems = useCallback(
+        (params: GetContextMenuItemsParams) => {
+            if (!params.node) {
+                return ["export"]
+            }
+
+            const patientId = Number(params.node.data.patientId)
+
+            let items = [
+                "cut",
+                "copy",
+                "copyWithHeaders",
+                "copyWithGroupHeaders",
+                "paste",
+                "separator",
+                {
+                    name: "新增資料",
+                    action: async () => {
+                        if (!params.node) return
+
+                        await addData({
+                            diagnosis,
+                            patientId,
+                        })
+                        await refetch()
+                    },
+                },
+                {
+                    name: "刪除資料",
+                    action: async () => {
+                        if (!params.node) return
+
+                        await deleteData({
+                            diagnosis,
+                            rowId: params.node.data.id,
+                        })
+                        await refetch()
+                    },
+                    cssClasses: ["text-red-400"],
+                },
+                "separator",
+                "chartRange",
+                "export",
+            ]
+            return items
+        },
+        [],
+    )
+
+    return {
+        rowData,
+        columnDefs,
+        rowIDGetter,
+        onGridReady,
+        getContextMenuItems,
+    }
 }

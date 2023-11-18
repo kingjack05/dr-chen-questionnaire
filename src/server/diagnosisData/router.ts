@@ -89,6 +89,18 @@ export const diagnosisDataRouter = createTRPCRouter({
                 console.log(error)
             }
         }),
+    deleteData: adminProcedure
+        .input(z.object({ rowId: z.number(), diagnosis: z.string() }))
+        .mutation(async ({ input }) => {
+            const { rowId, diagnosis } = input
+            const table = tableMap[diagnosis]
+            try {
+                const result = await db.delete(table).where(eq(table.id, rowId))
+                return result
+            } catch (error) {
+                console.log(error)
+            }
+        }),
     test: adminProcedure.query(() => {
         return Object.keys(AINData).map((key) => ({ field: key }))
     }),

@@ -351,8 +351,8 @@ const QuestionnaireScoreAccordion = ({
     totalScore: string
 }) => {
     return (
-        <details className="group" open>
-            <summary className="flex cursor-pointer list-none items-center justify-between">
+        <details className="group">
+            <summary className="flex cursor-pointer list-none items-center justify-between [&::-webkit-details-marker]:hidden">
                 <div className="flex items-center">
                     <span className="transition group-open:rotate-180">
                         <svg
@@ -734,6 +734,7 @@ const QuestionnaireSettingPopover = ({
 const AddPatientModal = () => {
     let [isOpen, setIsOpen] = useState(false)
     const addPatient = trpc.patient.addPatient.useMutation()
+    const addDiagnosisData = trpc.diagnosisData.addData.useMutation()
 
     return (
         <>
@@ -760,9 +761,25 @@ const AddPatientModal = () => {
                             <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
                                 <Dialog.Panel className="mx-auto max-w-sm rounded bg-white py-4 pl-4 pr-8">
                                     <AddPatientForm
-                                        onSubmit={(v) => {
-                                            console.log(v)
-                                            addPatient.mutate(v)
+                                        onSubmit={async (data) => {
+                                            const { diagnoses } = data
+                                            console.log(data)
+                                            await addPatient
+                                                .mutateAsync(data)
+                                                .then(() => {
+                                                    if (!diagnoses) return
+                                                    diagnoses.forEach(
+                                                        (diagnosis) => {
+                                                            addDiagnosisData.mutate(
+                                                                {
+                                                                    patientId:
+                                                                        data.id,
+                                                                    diagnosis,
+                                                                },
+                                                            )
+                                                        },
+                                                    )
+                                                })
                                         }}
                                     />
                                 </Dialog.Panel>

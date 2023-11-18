@@ -16,8 +16,13 @@ const DataStudioPageWithoutProvider = () => {
     const table = queryParameters.get("table") ?? "Raynaud"
     document.title = table + " 表格"
     const patientID = queryParameters.get("id") ?? "10836635"
-    const { rowData, columnDefs, rowIDGetter, onGridReady } =
-        tableConfigsFactory(table)
+    const {
+        rowData,
+        columnDefs,
+        rowIDGetter,
+        onGridReady,
+        getContextMenuItems,
+    } = tableConfigsFactory(table)
     const saveData = trpc.diagnosisData.setData.useMutation().mutateAsync
     const refetch = trpc.diagnosisData.getAllData.useQuery({
         diagnosis: table,
@@ -52,6 +57,7 @@ const DataStudioPageWithoutProvider = () => {
                     await saveData({ rowId, diagnosis: table, colName, value })
                     await refetch()
                 }}
+                getContextMenuItems={getContextMenuItems}
                 sideBar={{
                     toolPanels: [
                         {
