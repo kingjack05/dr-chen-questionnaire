@@ -85,29 +85,42 @@ export const AddPatientForm = ({ onSubmit }: PropTypes) => {
                             </svg>
                         </label>
                     </div>
-                    <label className="block">
+                    <label className="my-4 flex">
                         姓名:
                         <input
                             {...register("name")}
-                            className="input mb-2 block bg-transparent"
+                            className="input ml-8 block w-32 bg-transparent"
                         />
                     </label>
-                    <label className="block">
+                    <label className="my-4 flex">
                         病歷號:
                         <input
                             type="number"
                             {...register("id", {
                                 valueAsNumber: true,
                             })}
-                            className="input mb-2 block bg-transparent"
+                            className="input ml-4 block w-32 bg-transparent"
                         />
                     </label>
-                    <label className="block">
+                    <label className="my-4 flex">
                         生日:
                         <input
-                            type="date"
-                            {...register("birthday", { valueAsDate: true })}
-                            className="ml-4"
+                            type="number"
+                            {...register("birthday", {
+                                setValueAs: (v) => {
+                                    const l = v.length
+                                    const year = v.substring(0, l - 4)
+                                    const month = v.substring(l - 4, l - 2)
+                                    const day = v.substring(l - 2)
+                                    return new Date(
+                                        `${String(
+                                            Number(year) + 1911,
+                                        )}-${month}-${day}T08:00:00.000+08:00`,
+                                    )
+                                },
+                            })}
+                            className="input ml-8 block w-32 bg-transparent"
+                            placeholder="格式: 1121119"
                         />
                     </label>
                     <div>

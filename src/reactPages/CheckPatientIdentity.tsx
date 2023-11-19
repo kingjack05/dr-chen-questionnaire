@@ -6,7 +6,9 @@ import { QueryContextProvider } from "../components/Providers/QueryContext"
 
 export const CheckPatientIdentityPageWithoutProvider = () => {
     const [name, setName] = useState("")
-    const [bday, setBday] = useState("1990-06-01")
+    const [bdayYear, setBdayYear] = useState("65")
+    const [bdayMonth, setBdayMonth] = useState("6")
+    const [bdayDay, setBdayDay] = useState("4")
     const [errMsg, setErrMsg] = useState("")
 
     const getPatient = trpc.patient.patientByNameAndBDay.useMutation()
@@ -18,10 +20,11 @@ export const CheckPatientIdentityPageWithoutProvider = () => {
                     陳思恆醫師問卷系統
                 </div>
                 <div className=" w-80 rounded border border-gray-300">
-                    <div className=" mb-20 ml-8 mt-10 text-xl">
+                    <div className=" mb-12 ml-8 mt-10 text-xl">
                         請輸入您的姓名和生日:
                     </div>
                     <div className=" ml-8">
+                        <div className=" text-gray-400">姓名</div>
                         <input
                             autoFocus
                             type="text"
@@ -31,24 +34,58 @@ export const CheckPatientIdentityPageWithoutProvider = () => {
                                 setName(e.target.value)
                             }}
                         />
-                        <input
-                            type="date"
-                            value={bday}
-                            onChange={(e) => {
-                                setBday(e.target.value)
-                            }}
-                            className="text-xl"
-                        />
+                        <div className=" text-gray-400">生日 (民國)</div>
+                        <div className=" mt-2 flex">
+                            <input
+                                type="number"
+                                className="input w-12 text-center text-xl"
+                                value={bdayYear}
+                                onChange={(e) => {
+                                    setBdayYear(e.target.value)
+                                }}
+                            />
+                            <div className="mx-4">/</div>
+                            <input
+                                type="number"
+                                className="input w-12 text-center text-xl"
+                                value={bdayMonth}
+                                onChange={(e) => {
+                                    setBdayMonth(e.target.value)
+                                }}
+                            />
+                            <div className="mx-4">/</div>
+                            <input
+                                type="number"
+                                className="input w-12 text-center text-xl"
+                                value={bdayDay}
+                                onChange={(e) => {
+                                    setBdayDay(e.target.value)
+                                }}
+                            />
+                        </div>
                     </div>
                     <div className="mb-8 mr-6 mt-16 flex flex-row-reverse">
                         <button
                             className="btn"
                             onClick={async () => {
                                 try {
+                                    const month =
+                                        bdayMonth.length === 2
+                                            ? bdayMonth
+                                            : `0${bdayMonth}`
+                                    const day =
+                                        bdayDay.length === 2
+                                            ? bdayDay
+                                            : `0${bdayDay}`
+                                    const bday = new Date(
+                                        `${String(
+                                            Number(bdayYear) + 1911,
+                                        )}-${month}-${day}T08:00:00.000+08:00`,
+                                    )
                                     const result = await getPatient.mutateAsync(
                                         {
                                             name,
-                                            bday: new Date(bday),
+                                            bday,
                                         },
                                     )
                                     if (!result) {
