@@ -10,6 +10,7 @@ import { ActionPanel } from "./custom tool panels/ActionPanel"
 import { trpc } from "../trpc"
 import { QueryContextProvider } from "../Providers/QueryContext"
 import { tableConfigsFactory } from "./tableConfigsFactory"
+import { CustomTooltip } from "./CustomTooltip.jsx"
 
 const DataStudioPageWithoutProvider = () => {
     const queryParameters = new URLSearchParams(window.location.search)
@@ -35,6 +36,7 @@ const DataStudioPageWithoutProvider = () => {
             filter: true,
             resizable: true,
             initialWidth: 100,
+            tooltipComponent: CustomTooltip,
         }),
         [],
     )
@@ -58,6 +60,8 @@ const DataStudioPageWithoutProvider = () => {
                     await refetch()
                 }}
                 getContextMenuItems={getContextMenuItems}
+                tooltipShowDelay={0}
+                tooltipHideDelay={2000}
                 sideBar={{
                     toolPanels: [
                         {

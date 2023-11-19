@@ -77,13 +77,42 @@ const useRaynaudTableConfigs = () => {
         {
             headerName: "疾病資料",
             children: [
-                { field: "affectedSide" },
+                {
+                    field: "affectedSide",
+                    headerTooltip: "affectedSide",
+                    tooltipComponentParams: {
+                        name: "Affected Side",
+                        caption: "0: Left\n1: Right",
+                    },
+                },
                 {
                     headerName: "風險因子",
                     children: [
-                        { field: "comorbidities" },
-                        { field: "psychologicalDisorder" },
-                        { field: "smoking" },
+                        {
+                            field: "comorbidities",
+                            headerTooltip: "comorbidities",
+                            tooltipComponentParams: {
+                                name: "Comorbidities",
+                                caption:
+                                    "0:None\n1:SLE\n2:SSc\n3:SLE&SSc\n4:Others",
+                            },
+                        },
+                        {
+                            field: "psychologicalDisorder",
+                            headerTooltip: "psychologicalDisorder",
+                            tooltipComponentParams: {
+                                name: "Psychological Disorder",
+                                caption: "0:None\n1:Anxiety\n2:Depression",
+                            },
+                        },
+                        {
+                            field: "smoking",
+                            headerTooltip: "smoking",
+                            tooltipComponentParams: {
+                                name: "Smoking",
+                                caption: "0:Never\n1:Former\n2:Current",
+                            },
+                        },
                         { field: "autoimmuneDzSince" },
                         { field: "raynaudSince" },
                     ],
@@ -94,8 +123,22 @@ const useRaynaudTableConfigs = () => {
                     children: [
                         { field: "yearsFromAutoimmuneToOp" },
                         { field: "yearsFromRaynaudToOp" },
-                        { field: "pastIntervention" },
-                        { field: "oralVasodilatorTreatment" },
+                        {
+                            field: "pastIntervention",
+                            headerTooltip: "pastIntervention",
+                            tooltipComponentParams: {
+                                name: "Past Intervention",
+                                caption: "0:Never\n1:Botox Injection",
+                            },
+                        },
+                        {
+                            field: "oralVasodilatorTreatment",
+                            headerTooltip: "oralVasodilatorTreatment",
+                            tooltipComponentParams: {
+                                name: "Oral Vasodilator Treatment",
+                                caption: "0:Never\n1:Former\n2:Current",
+                            },
+                        },
                         { field: "seasonal" },
                     ],
                     columnGroupShow: "open",
@@ -109,7 +152,15 @@ const useRaynaudTableConfigs = () => {
                 {
                     headerName: "其它",
                     children: [
-                        { field: "nailfoldCapillaryMicroscopy" },
+                        {
+                            field: "nailfoldCapillaryMicroscopy",
+                            headerTooltip: "nailfoldCapillaryMicroscopy",
+                            tooltipComponentParams: {
+                                name: "Nailfold Capillary Microscopy",
+                                caption:
+                                    "1: Class I\n2: Class II\n3: Class III\n4: Class IV",
+                            },
+                        },
                         { field: "nerveOfHenleDistanceToPisiform" },
                     ],
                     columnGroupShow: "open",
@@ -366,29 +417,164 @@ const AINTableConfigs = () => {
         },
         {
             headerName: "疾病資料",
-            children: [{ field: "group" }, { field: "palsySide" }],
+            children: [
+                {
+                    field: "group",
+                    headerTooltip: "group",
+                    tooltipComponentParams: {
+                        name: "Group",
+                        caption: "0: 未受過外傷\n1: 受過外傷",
+                    },
+                },
+                { field: "palsySide" },
+            ],
         },
         {
             headerName: "追蹤資料",
             children: [
                 { field: "postOPMonth", pinned: "left" },
-                { field: "admCMAP" },
-                { field: "fdiCMAP" },
-                { field: "SNAP" },
-                { field: "postMed" },
-                { field: "2PDSmall" },
-                { field: "2PDRing" },
-                { field: "2PDNormal" },
-                { field: "gripIH" },
-                { field: "pinchIH" },
-                { field: "fdi" },
-                { field: "digAbd" },
-                { field: "raAdd" },
-                { field: "uiAdd" },
-                { field: "froment" },
-                { field: "clawing" },
-                { field: "wart" },
-                { field: "intPlus" },
+                {
+                    field: "admCMAP",
+                    headerTooltip: "admCMAP",
+                    tooltipComponentParams: {
+                        name: "ADM CMAP",
+                        caption:
+                            "某肌肉的動作電位，測量時間點為術前、術後1年、術後2年",
+                    },
+                },
+                {
+                    field: "fdiCMAP",
+                    headerTooltip: "fdiCMAP",
+                    tooltipComponentParams: {
+                        name: "FDI CMAP",
+                        caption:
+                            "某肌肉的動作電位，測量時間點為術前、術後1年、術後2年",
+                    },
+                },
+                {
+                    field: "SNAP",
+                    headerTooltip: "SNAP",
+                    tooltipComponentParams: {
+                        name: "SNAP",
+                        caption: "感覺神經電位",
+                    },
+                },
+                {
+                    field: "postMed",
+                    headerTooltip: "postMed",
+                    tooltipComponentParams: {
+                        name: "Post Med",
+                        caption:
+                            "術後正中神經電位，測量時間點為術後1年、術後2年(術前未測量)",
+                    },
+                },
+                {
+                    field: "2PDSmall",
+                    headerTooltip: "2PDSmall",
+                    tooltipComponentParams: {
+                        name: "2PD Small",
+                        caption:
+                            "能夠感受小指頭兩個點間刺激差異的最小距離，單位為mm",
+                    },
+                },
+                {
+                    field: "2PDRing",
+                    headerTooltip: "2PDRing",
+                    tooltipComponentParams: {
+                        name: "2PD Ring",
+                        caption:
+                            "能夠感受無名指兩個點間刺激差異的最小距離，單位為mm",
+                    },
+                },
+                {
+                    field: "2PDNormal",
+                    headerTooltip: "2PDNormal",
+                    tooltipComponentParams: {
+                        name: "2PD Normal",
+                        caption:
+                            "能夠感受正常手指兩個點間刺激差異的最小距離，單位為mm",
+                    },
+                },
+                {
+                    field: "gripIH",
+                    headerTooltip: "gripIH",
+                    tooltipComponentParams: {
+                        name: "Grip IH",
+                        caption: "每次回診時受傷側與正常側的握力的比值",
+                    },
+                },
+                {
+                    field: "pinchIH",
+                    headerTooltip: "pinchIH",
+                    tooltipComponentParams: {
+                        name: "Pinch IH",
+                        caption: "每次回診時受傷側與正常側的捏力的比值",
+                    },
+                },
+                {
+                    field: "fdi",
+                    headerTooltip: "fdi",
+                    tooltipComponentParams: {
+                        name: "FDI",
+                        caption: "某肌肉力量等級",
+                    },
+                },
+                {
+                    field: "digAbd",
+                    headerTooltip: "digAbd",
+                    tooltipComponentParams: {
+                        name: "Dig Abd",
+                        caption: "某肌肉力量等級",
+                    },
+                },
+                {
+                    field: "raAdd",
+                    headerTooltip: "raAdd",
+                    tooltipComponentParams: {
+                        name: "Ra Add",
+                        caption: "某肌肉力量等級",
+                    },
+                },
+                {
+                    field: "uiAdd",
+                    headerTooltip: "uiAdd",
+                    tooltipComponentParams: {
+                        name: "Ui Add",
+                        caption: "某肌肉力量等級",
+                    },
+                },
+                {
+                    field: "froment",
+                    headerTooltip: "froment",
+                    tooltipComponentParams: {
+                        name: "Froment",
+                        caption: "神經麻痺時會出現的現象(1為麻痺時出現)",
+                    },
+                },
+                {
+                    field: "clawing",
+                    headerTooltip: "clawing",
+                    tooltipComponentParams: {
+                        name: "Clawing",
+                        caption: "神經麻痺時會出現的現象(1為麻痺時出現)",
+                    },
+                },
+                {
+                    field: "wart",
+                    headerTooltip: "wart",
+                    tooltipComponentParams: {
+                        name: "Wart",
+                        caption: "神經麻痺時會出現的現象(1為麻痺時出現)",
+                    },
+                },
+                {
+                    field: "intPlus",
+                    headerTooltip: "intPlus",
+                    tooltipComponentParams: {
+                        name: "Int Plus",
+                        caption: "手指功能恢復時才能做到的動作(1為能做到)",
+                    },
+                },
                 { field: "bsrs", editable: false },
                 { field: "sf36", editable: false },
                 { field: "dash", editable: false },
