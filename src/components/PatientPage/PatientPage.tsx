@@ -125,7 +125,7 @@ const PatientPageWithoutProvider = () => {
                         {patientData.diagnoses &&
                             patientData.diagnoses.map((diagnosis) => {
                                 return (
-                                    <div>
+                                    <div key={diagnosis}>
                                         <a
                                             href={`/dataStudio?table=${diagnosis}&id=${patientID}`}
                                             className="btn"
@@ -706,7 +706,10 @@ const QuestionnaireSettingPopover = ({
                                 >
                                     {questionnaireEnum.map((questionnaire) => {
                                         return (
-                                            <label className="block">
+                                            <label
+                                                className="block"
+                                                key={questionnaire}
+                                            >
                                                 <input
                                                     {...register(
                                                         "followingQuestionnaires",

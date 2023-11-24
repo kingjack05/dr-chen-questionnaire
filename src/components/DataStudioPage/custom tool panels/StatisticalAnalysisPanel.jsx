@@ -53,7 +53,10 @@ export const StatisticalAnalysisPanel = ({ api, columnApi }) => {
                     </thead>
                     <tbody>
                         {results.map(({ col, avg, std, coef, p }) => (
-                            <tr className=" border-b p-4 align-middle transition-colors last:border-0 last:bg-gray-400 hover:bg-gray-200/50">
+                            <tr
+                                className=" border-b p-4 align-middle transition-colors last:border-0 last:bg-gray-400 hover:bg-gray-200/50"
+                                key={col}
+                            >
                                 <td>{col}</td>
                                 <td>{Math.round(avg * 100) / 100}</td>
                                 <td>{Math.round(std * 100) / 100}</td>

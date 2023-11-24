@@ -161,7 +161,10 @@ export const ActionPanel = ({ api, columnApi }) => {
                     >
                         <option value="">請選擇日期</option>
                         {QuestionnaireData.map(({ date }) => (
-                            <option value={date.toISOString().substring(0, 10)}>
+                            <option
+                                value={date.toISOString().substring(0, 10)}
+                                key={date.toISOString()}
+                            >
                                 {date.toISOString().substring(0, 10)}
                             </option>
                         ))}
