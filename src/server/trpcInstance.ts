@@ -99,23 +99,27 @@ type Context = inferAsyncReturnType<typeof createTRPCContext>
 import { initTRPC, TRPCError } from "@trpc/server"
 import superjson from "superjson"
 import { z, ZodError } from "zod"
+import type { OpenApiMeta } from "trpc-openapi"
 
-export const t = initTRPC.context<Context>().create({
-    // transformer needed to use date objects https://trpc.io/docs/server/data-transformers
-    transformer: superjson,
-    errorFormatter({ shape, error }) {
-        return {
-            ...shape,
-            data: {
-                ...shape.data,
-                zodError:
-                    error.cause instanceof ZodError
-                        ? error.cause.flatten()
-                        : null,
-            },
-        }
-    },
-})
+export const t = initTRPC
+    .context<Context>()
+    .meta<OpenApiMeta>()
+    .create({
+        // transformer needed to use date objects https://trpc.io/docs/server/data-transformers
+        transformer: superjson,
+        errorFormatter({ shape, error }) {
+            return {
+                ...shape,
+                data: {
+                    ...shape.data,
+                    zodError:
+                        error.cause instanceof ZodError
+                            ? error.cause.flatten()
+                            : null,
+                },
+            }
+        },
+    })
 
 /**
  * 3. ROUTER & PROCEDURE (THE IMPORTANT BIT)

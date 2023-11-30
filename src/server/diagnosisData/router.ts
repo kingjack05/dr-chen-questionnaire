@@ -101,7 +101,18 @@ export const diagnosisDataRouter = createTRPCRouter({
                 console.log(error)
             }
         }),
-    test: adminProcedure.query(() => {
-        return Object.keys(AINData).map((key) => ({ field: key }))
-    }),
+    test: adminProcedure
+        .meta({
+            openapi: {
+                method: "GET",
+                path: "/test",
+                description: "test description",
+                tags: ["diagnosisData"],
+            },
+        })
+        .input(z.object({}))
+        .output(z.object({}))
+        .query(() => {
+            return Object.keys(AINData).map((key) => ({ field: key }))
+        }),
 })
